@@ -15,15 +15,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import cn.hzjkyy.model.Plan;
+
 public class Log {
 	public static Path currentPath = Paths.get("").toAbsolutePath();
 	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	private static DateFormat dayDateFormat = new SimpleDateFormat("yyyyMMdd");
 	private static List<Log> logs = new ArrayList<Log>();
-	private static int lineLimit = 5000;
+	private static int lineLimit;
+	private static Plan plan;
 	
-	public static Log getTestLog(String name){
-		Log.lineLimit = 1; 
-		return getLog(name);
+	public static void init(Plan plan1, int lineLimit1){
+		plan = plan1;
+		lineLimit = lineLimit1;
 	}
 	
 	public static Log getLog(String name) {
@@ -46,14 +50,23 @@ public class Log {
 	    ps.close();
 	    return baos.toString();
 	}
-	
+
+	private Log(String name) {
+		this.name = name;
+	}
+	private String name;
 	private String getName() {
 		return name;
 	}
-
-	private String name;
-	private Log(String name) {
-		this.name = name;
+	
+	private String filePath;
+	private String getFilePath() {
+		if(filePath == null){
+			String fileName = String.format("%s_%d_%s", dayDateFormat.format(new Date()), plan.getId(), name);
+			filePath = currentPath.resolve(fileName + ".txt").toString();
+		}
+		
+		return filePath;
 	}
 	
 	private StringBuilder content = new StringBuilder();
@@ -89,7 +102,7 @@ public class Log {
 	private File file;
 	private void writeToFile(String data){
 		if(file == null){
-			file = new File(currentPath.resolve(name + "-" + dateFormat.format(new Date()) + ".txt").toString());			
+			file = new File(getFilePath());			
 		}
 
 		try {

@@ -19,7 +19,7 @@ import cn.hzjkyy.model.Request;
 import cn.hzjkyy.model.Response;
 import cn.hzjkyy.tool.Log;
 
-public class Explorer {
+public abstract class Explorer {
 	public void close() {
 		tabs.clear();
 		explorerLog.write();

@@ -1,35 +1,159 @@
 package cn.hzjkyy;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.hzjkyy.agent.AdvancedExplorer;
-import cn.hzjkyy.agent.Explorer;
 import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.agent.Tab;
+import cn.hzjkyy.generator.BookGenerator;
+import cn.hzjkyy.generator.ExamGenerator;
+import cn.hzjkyy.generator.LoginGenerator;
 import cn.hzjkyy.model.Device;
+import cn.hzjkyy.model.Exam;
 import cn.hzjkyy.model.Plan;
+import cn.hzjkyy.model.Request;
+import cn.hzjkyy.model.Response;
 import cn.hzjkyy.model.User;
+import cn.hzjkyy.parser.LoginParser;
 import cn.hzjkyy.tool.Log;
+import cn.hzjkyy.tool.OcsClient;
 
 public class Application {
-	private static Date today = new Date();
 	public static void main(String[] args){
 		//获取预约计划
 		PlanClient planClient = new PlanClient();
 		Plan plan = planClient.fetch();
 		
-		//组建基本环境
-		Log applicationLog = Log.getLog(getLogName(plan, "application"));
+		//创建日志
+		Log.init(plan, 5000);
+		Log applicationLog = Log.getLog("application");
+		
+		//初始化
 		User user = new User(plan.getSfzmhm(), plan.getPass());
 		Device device = new Device();
-		Explorer explorer = new AdvancedExplorer(300000, 4);
+		AdvancedExplorer explorer = new AdvancedExplorer(300000, 4);
 		Tab mainTab = explorer.newTab();
-	}
+		
+		//登录
+		applicationLog.record("登录：");
+		LoginGenerator loginGenerator = new LoginGenerator(user, device);
+		Request loginRequest = loginGenerator.generate();
+		LoginParser loginParser = new LoginParser();
 
-	private static DateFormat dayDateFormat = new SimpleDateFormat("yyyyMMdd");
-	private static String getLogName(Plan plan, String name) {
-		return String.format("%s_%d_%s", dayDateFormat.format(today), plan.getId(), name);
+		do {
+			applicationLog.record("登录中...");
+			Response response = mainTab.visit(loginRequest);
+			if(response.getStatusPanel().isSuccess()){
+				loginParser.parse(response.getResponseBody());					
+			}
+		} while(!loginParser.getStatusPanel().isSuccess());
+		user.setXm(loginParser.getXm());
+		user.setToken(loginParser.getToken());
+		user.setSfzmmc(loginParser.getSfzmmc());
+		applicationLog.record("登录成功，姓名：" + loginParser.getXm() + "，密钥：" + loginParser.getToken());
+		
+		long start = getStart();
+		long end = getEnd();
+		int interval = 60000 / plan.getTotal();
+		
+		while(System.currentTimeMillis() < start){
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+		}
+
+		//获取考试日期
+		Pattern ksrqPattern = Pattern.compile("<ksrq>(2014-10-.+?)</ksrq>");
+		String ksrq = getKsrq(plan.getKskm());
+		long current = System.currentTimeMillis();
+		long lastPosition = -1;
+		while(ksrq.isEmpty() && current < end){
+			long currentPosition = (current - start) / interval;
+			if((currentPosition != lastPosition) && (currentPosition % plan.getTotal() == plan.getNumber())){
+				lastPosition = currentPosition;
+				applicationLog.record("开始获取考试日期：");
+				ExamGenerator examGenerator = new ExamGenerator(user);
+				Request examRequest = examGenerator.generate();
+				Response response = mainTab.visit(examRequest);
+				if(response.getStatusPanel().isSuccess()){
+					Matcher m = ksrqPattern.matcher(response.getResponseBody());
+					if (m.find()) {
+						ksrq = m.group(1);
+						applicationLog.record("获取考试日期成功：" + ksrq);
+						setKsrq(ksrq, plan.getKskm());
+					}
+				}
+			}
+			if(ksrq.isEmpty()){
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+				}
+				ksrq = getKsrq(plan.getKskm());
+				current = System.currentTimeMillis();				
+			}
+		}
+		
+		boolean success = false;
+		if(!ksrq.isEmpty()){
+			//预约考试
+			Exam exam = new Exam("51", plan.getKsdd(), ksrq);
+			applicationLog.record("开始预约考试：");
+			BookGenerator bookGenerator = new BookGenerator(user, plan.getJlc(), exam);
+			Request bookRequest = bookGenerator.generate();
+			do {
+				applicationLog.record("预约中...");
+				Response response = mainTab.visit(bookRequest);
+				if(response.getStatusPanel().isSuccess() && response.getResponseBody().contains("<code>1</code>")){
+					applicationLog.record("预约考试成功！");
+					success = true;
+					break;
+				}
+			}while(System.currentTimeMillis() < end);
+		}
+		
+		planClient.report(plan, ksrq, success);
+		explorer.close();
+		applicationLog.write();
+		applicationLog.upload();
+	}
+	
+	//开始检查考试计划的时间
+	private static long getStart() {
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(Calendar.HOUR_OF_DAY, 8);
+		calendar.set(Calendar.MINUTE, 59);
+		calendar.set(Calendar.SECOND, 50);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTimeInMillis();
+	}
+	
+	//结束程序的时间
+	private static long getEnd() {
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(Calendar.HOUR_OF_DAY, 9);
+		calendar.set(Calendar.MINUTE, 10);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTimeInMillis();
+	}
+	
+	//查看是否已经开始放号
+	private static String getKsrq(String kskm) {
+		Object ksrq = OcsClient.get("km" + kskm);
+		if(ksrq != null){
+			return ksrq.toString();
+		}else{
+			return "";
+		}
+	}
+	
+	//将已经开始放的号，推送到服务器上
+	private static void setKsrq(String ksrq, String kskm){
+		OcsClient.set("km" + kskm, ksrq);
 	}
 }

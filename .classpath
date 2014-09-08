@@ -13,5 +13,6 @@
 	<classpathentry kind="lib" path="/Users/sefier/Downloads/aliyun_java_sdk_20140626/lib/gson-2.2.4.jar"/>
 	<classpathentry kind="lib" path="/Users/sefier/Downloads/aliyun_java_sdk_20140626/lib/jdom-1.1.jar"/>
 	<classpathentry kind="lib" path="/Users/sefier/Downloads/aliyun_java_sdk_20140626/lib/protobuf-java-2.4.1.jar"/>
+	<classpathentry kind="lib" path="/Users/sefier/Downloads/spymemcached-2.8.4(Java)(大于2.8.1).jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
