@@ -2,6 +2,7 @@ package cn.hzjkyy.test;
 
 import cn.hzjkyy.agent.Explorer;
 import cn.hzjkyy.agent.Tab;
+import cn.hzjkyy.generator.BookGenerator;
 import cn.hzjkyy.generator.ExamGenerator;
 import cn.hzjkyy.generator.JlcGenerator;
 import cn.hzjkyy.generator.LoginGenerator;
@@ -20,7 +21,7 @@ public class Test6 {
 		//组建基本环境
 		Log applicationLog = Log.getLog("application" + "-" + "Test6");
 		Explorer explorer = new Explorer("Test6");
-		User user = new User("330124199403233524", "123456");
+		User user = new User("330902198209025837", "123456");
 		Device device = new Device();
 		Tab mainTab = explorer.newTab();
 
@@ -62,7 +63,7 @@ public class Test6 {
 
 		//获取考试信息
 		applicationLog.record("系统开始获取考试信息：");
-		while(System.currentTimeMillis() < 1410138600000L){
+		while(System.currentTimeMillis() < 1410225000000L){
 			ExamGenerator examGenerator = new ExamGenerator(user);
 			Request examRequest = examGenerator.generate();
 			ExamParser examParser = new ExamParser();
@@ -77,6 +78,18 @@ public class Test6 {
 			}else{
 				Exam exam = examParser.getExam();
 				applicationLog.record("获取考试信息成功：" + exam.kscc + "," + exam.ksdd + "," + exam.ksrq);
+				
+				applicationLog.record("系统开始预约考试：");
+				BookGenerator bookGenerator = new BookGenerator(user, jlc, exam);
+				Request bookRequest = bookGenerator.generate();
+				
+				applicationLog.record("预约中...");
+				response = mainTab.visit(bookRequest);
+				if(response.getStatusPanel().isSuccess() && response.getResponseBody().contains("<code>1</code>")){
+					applicationLog.record("预约考试成功！");
+				}else{
+					applicationLog.record("预约失败");
+				}
 				break;
 			}
 

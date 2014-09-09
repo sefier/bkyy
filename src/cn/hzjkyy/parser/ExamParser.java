@@ -17,7 +17,7 @@ public class ExamParser extends Parser{
 		return exam;
 	}
 	
-	private Pattern examPattern = Pattern.compile("<item.*?<kscc>(\\d+)</kscc><ksdd>(\\d+)</ksdd><ksrq>(.+?)</ksrq></item>");
+	private Pattern examPattern = Pattern.compile("<item.*?<kscc>(\\d+)</kscc><ksdd>(\\d+)</ksdd><ksrq>(2014-10.+?)</ksrq></item>");
 	public void parse(String response) {
 		clear();
 		

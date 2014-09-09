@@ -20,7 +20,7 @@ public class Test2 {
 		Log applicationLog = Log.getLog("application" + "-" + "Test2");
 		Explorer explorer = new Explorer("Test2");
 		Tab mainTab = explorer.newTab();
-		User user = new User("339005197810019626", "711927");
+		User user = new User("330822196901153318", "123456");
 		Device device = new Device();
 		
 		//登录
@@ -57,8 +57,8 @@ public class Test2 {
 		String kskm = jlcParser.getKskm();
 		user.setKskm(kskm);
 		applicationLog.record("获取教练车成功：" + jlc + ",考试科目：" + kskm);
-
-		while(System.currentTimeMillis() < 1410138120000L){
+		
+		while(System.currentTimeMillis() < 1410224460000L){
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -67,7 +67,7 @@ public class Test2 {
 
 		//预约考试
 		applicationLog.record("系统开始预约考试：");
-		Exam exam = new Exam("51", "3301007", "2014-09-30");
+		Exam exam = new Exam("51", "3301996", "2014-10-01");
 		BookGenerator bookGenerator = new BookGenerator(user, jlc, exam);
 		Request bookRequest = bookGenerator.generate();
 		
