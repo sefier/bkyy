@@ -40,4 +40,10 @@ public class OcsClient {
 			return null;
 		}
 	}
+	
+	public static void close() {
+		if(cache != null){
+			cache.shutdown();			
+		}
+	}
 }  

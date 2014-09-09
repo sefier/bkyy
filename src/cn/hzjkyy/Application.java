@@ -120,6 +120,7 @@ public class Application {
 		explorer.close();
 		applicationLog.write();
 		applicationLog.upload();
+		OcsClient.close();
 	}
 	
 	//开始检查考试计划的时间
