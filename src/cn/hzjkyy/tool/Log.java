@@ -99,6 +99,11 @@ public class Log {
 		}
 	}
 	
+	public void close() {
+		write();
+		upload();
+	}
+	
 	private File file;
 	private void writeToFile(String data){
 		if(file == null){

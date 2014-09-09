@@ -22,17 +22,19 @@ import cn.hzjkyy.tool.Log;
 import cn.hzjkyy.tool.OcsClient;
 
 public class Application {
+	public static final boolean isTest = true;
 	public static void main(String[] args){
 		//获取预约计划
-		PlanClient planClient = new PlanClient();
+		PlanClient planClient = new PlanClient(isTest);
 		Plan plan = planClient.fetch();
 		
 		//创建日志
-		Log.init(plan, 5000);
+		Log.init(plan, isTest ? 1 : 5000);
 		Log applicationLog = Log.getLog("application");
 		
 		//初始化
 		User user = new User(plan.getSfzmhm(), plan.getPass());
+		user.setKskm(plan.getKskm());
 		Device device = new Device();
 		AdvancedExplorer explorer = new AdvancedExplorer(300000, 4);
 		Tab mainTab = explorer.newTab();
@@ -61,7 +63,7 @@ public class Application {
 		
 		while(System.currentTimeMillis() < start){
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(100);
 			} catch (InterruptedException e) {
 			}
 		}
@@ -108,7 +110,7 @@ public class Application {
 			do {
 				applicationLog.record("预约中...");
 				Response response = mainTab.visit(bookRequest);
-				if(response.getStatusPanel().isSuccess() && response.getResponseBody().contains("<code>1</code>")){
+				if(response.getStatusPanel().isSuccess() && response.getResponseBody().contains("您已预约成功")){
 					applicationLog.record("预约考试成功！");
 					success = true;
 					break;
@@ -118,8 +120,7 @@ public class Application {
 		
 		planClient.report(plan, ksrq, success);
 		explorer.close();
-		applicationLog.write();
-		applicationLog.upload();
+		applicationLog.close();
 		OcsClient.close();
 	}
 	
@@ -145,16 +146,22 @@ public class Application {
 	
 	//查看是否已经开始放号
 	private static String getKsrq(String kskm) {
-		Object ksrq = OcsClient.get("km" + kskm);
-		if(ksrq != null){
-			return ksrq.toString();
+		if(isTest){
+			return "2014-10-01";			
 		}else{
-			return "";
+			Object ksrq = OcsClient.get("km" + kskm);
+			if(ksrq != null){
+				return ksrq.toString();
+			}else{
+				return "";
+			}					
 		}
 	}
 	
 	//将已经开始放的号，推送到服务器上
 	private static void setKsrq(String ksrq, String kskm){
-		OcsClient.set("km" + kskm, ksrq);
+		if(!isTest){
+			OcsClient.set("km" + kskm, ksrq);			
+		}
 	}
 }

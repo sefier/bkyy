@@ -22,8 +22,7 @@ import cn.hzjkyy.tool.Log;
 public abstract class Explorer {
 	public void close() {
 		tabs.clear();
-		explorerLog.write();
-		explorerLog.upload();
+		explorerLog.close();
 	}
 	//浏览器请求信息
 	private String serverUrl = "http://service.zscg.hzcdt.com/api/httpapi";

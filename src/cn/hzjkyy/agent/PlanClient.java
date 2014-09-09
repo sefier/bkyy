@@ -21,12 +21,19 @@ import cn.hzjkyy.model.Plan;
 public class PlanClient {
 	//浏览器引擎（阻塞性）
 	private CloseableHttpClient httpclient = HttpClients.createDefault();
-	//private String host = "localhost:3000";
+	private String testHost = "localhost:3000";
 	private String host = "hzjkyy.sjyyt.com";
+	private boolean isTest;
+	public PlanClient(boolean isTest){
+		this.isTest = isTest;
+	}
+	private String getHost(){
+		return isTest ? testHost : host;
+	}
 
 	public Plan fetch() {
     	Plan plan = new Plan();
-		String serverUrl = "http://" + host + "/plans/fetch";
+		String serverUrl = "http://" + getHost() + "/plans/fetch";
 		HttpPost httpPost = new HttpPost(serverUrl);
 		CloseableHttpResponse httpResponse = null;
 				
