@@ -102,6 +102,8 @@ public abstract class Explorer {
 	        if (status >= 200 && status < 300){
 	        	response.getStatusPanel().success();
 	        	response.setResponseBody(EntityUtils.toString(httpResponse.getEntity()));
+	        }else{
+	        	exceptionString = "Status:" + status + EntityUtils.toString(httpResponse.getEntity());
 	        }
 		} catch (ParseException | IOException e) {
 			exceptionString = Log.exceptionStacktraceToString(e);
