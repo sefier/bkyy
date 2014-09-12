@@ -63,7 +63,7 @@ public class Test4 {
 
 		//获取考试信息
 		applicationLog.record("系统开始获取考试信息：");
-		while(System.currentTimeMillis() < 1410225000000L){
+		while(System.currentTimeMillis() < 1410485446000L){
 			ExamGenerator examGenerator = new ExamGenerator(user);
 			Request examRequest = examGenerator.generate();
 			ExamParser examParser = new ExamParser();
@@ -112,7 +112,7 @@ public class Test4 {
 			applicationLog.record("系统登录成功，姓名：" + loginParser.getXm() + "，密钥：" + loginParser.getToken());
 			
 			try {
-				Thread.sleep(60000);
+				Thread.sleep(6000);
 			} catch (InterruptedException e) {
 			}
 		}
