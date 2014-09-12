@@ -93,28 +93,33 @@ public abstract class Explorer {
 		CloseableHttpResponse httpResponse = null;
 		Response response = tab.getResponse();
 		String exceptionString = null;
-				
-		try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-	        httpResponse = httpclient.execute(httpPost);
-	        
-	        int status = httpResponse.getStatusLine().getStatusCode();
-	        if (status >= 200 && status < 300){
-	        	response.getStatusPanel().success();
-	        	response.setResponseBody(EntityUtils.toString(httpResponse.getEntity()));
-	        }else{
-	        	exceptionString = "Status:" + status + EntityUtils.toString(httpResponse.getEntity());
-	        }
-		} catch (ParseException | IOException e) {
-			exceptionString = Log.exceptionStacktraceToString(e);
-		} finally {
-			if (httpResponse != null) {
-				try {
-					httpResponse.close();
-				} catch (IOException e) {
-				}				
+
+		int tries = 0;
+		do{
+			tries++;
+			try {
+		        httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+		        httpResponse = httpclient.execute(httpPost);
+		        
+		        int status = httpResponse.getStatusLine().getStatusCode();
+		        if (status >= 200 && status < 300){
+		        	response.getStatusPanel().success();
+		        	response.setResponseBody(EntityUtils.toString(httpResponse.getEntity()));
+		        	break;
+		        }else{
+		        	exceptionString = "Status:" + status + EntityUtils.toString(httpResponse.getEntity());
+		        }
+			} catch (ParseException | IOException e) {
+				exceptionString = Log.exceptionStacktraceToString(e);
+			} finally {
+				if (httpResponse != null) {
+					try {
+						httpResponse.close();
+					} catch (IOException e) {
+					}				
+				}
 			}
-		}
+		}while(tries < 3);
 
     	response.getStatusPanel().finish(false);
     	explorerLog.record("请求接口：" + tab.getRequest().getJkid());

@@ -8,6 +8,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import cn.hzjkyy.model.Request;
+import cn.hzjkyy.tool.Log;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.fluent.Async;
@@ -46,27 +47,33 @@ public class AdvancedExplorer extends Explorer {
                 .socketTimeout(timeout)
                 .bodyForm(nvps);
 		Future<Content> future = async.execute(fluentRequest, new FutureCallback<Content>() {
-			public void record(){
+			public void record(String exceptionString){
 		    	explorerLog.record("请求接口：" + tab.getRequest().getJkid());
 		    	explorerLog.record("请求正文：" + tab.getRequest().getXmlDoc());
 		    	explorerLog.record("响应：" + tab.getResponse().getResponseBody());
 		    	explorerLog.record("响应状态：" + tab.getResponse().getStatusPanel().getStatus());
+		    	if(exceptionString != null){
+		        	explorerLog.record("异常信息：" + exceptionString);    		
+		    	}
 		    	explorerLog.record("耗时：" + (System.currentTimeMillis() - tab.getRequest().getSentAt()));
 			}
 			
             public void failed(Exception ex) {
             	tab.getResponse().getStatusPanel().error();
-            	record();
+            	record(Log.exceptionStacktraceToString(ex));
+            	tab.retry();
             }
 
             public void completed(Content content) {
+            	tab.getResponse().getStatusPanel().success();
             	tab.getResponse().setResponseBody(content.toString());
-            	record();
+            	record(null);
             }
 
             public void cancelled() {
             	tab.getResponse().getStatusPanel().setStatus(-2);
-            	record();
+            	record(null);
+            	tab.retry();
             }
         });
 		queue.add(future);

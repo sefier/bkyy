@@ -34,9 +34,10 @@ public class Tab {
 		visit(request, false);
 		return this.response;
 	}
-	
+	private int tries = 0;
 	//只是在浏览器中键入地址访问而已
 	public Tab visit(Request request, boolean async) {
+		tries++;
 		response.clear();
 		request.setSentAt(System.currentTimeMillis());
 		this.request = request;
@@ -48,7 +49,19 @@ public class Tab {
 		return this;
 	}
 	
+	public void retry(){
+		if(tries < 3){
+			explorer.getExplorerLog().record("第" + tries + "次重试");
+			visit(request, true);
+		}
+	}
+	
+	public int getTries(){
+		return tries;
+	}
+	
 	public boolean isOver() {
-		return response.getStatusPanel().getStatus() != 0;
+		int status = response.getStatusPanel().getStatus();
+		return status > 0 || status < 0 && tries >= 3;
 	}
 }
