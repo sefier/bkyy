@@ -62,6 +62,6 @@ public class Tab {
 	
 	public boolean isOver() {
 		int status = response.getStatusPanel().getStatus();
-		return status > 0 || status < 0 && tries >= 3;
+		return status > 0 || status < 0 && tries >= 10;
 	}
 }
