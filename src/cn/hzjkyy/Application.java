@@ -42,6 +42,15 @@ public class Application {
 		AdvancedExplorer explorer = new AdvancedExplorer(300000, 4);
 		Tab mainTab = explorer.newTab();
 		
+		//等待登录
+		long prepare = getPrepare();
+		while(System.currentTimeMillis() < prepare){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+		
 		//登录
 		applicationLog.record("登录：");
 		LoginGenerator loginGenerator = new LoginGenerator(user, device);
@@ -61,9 +70,6 @@ public class Application {
 		applicationLog.record("登录成功，姓名：" + loginParser.getXm() + "，密钥：" + loginParser.getToken());
 		
 		long start = getStart();
-		long end = getEnd();
-		int interval = 60000 / plan.getTotal();
-		
 		while(System.currentTimeMillis() < start){
 			try {
 				Thread.sleep(100);
@@ -72,6 +78,8 @@ public class Application {
 		}
 
 		//获取考试日期
+		long end = getEnd();
+		int interval = 2000 / plan.getTotal();
 		String month = isTest ? "09" : "10";
 		Pattern ksrqPattern = Pattern.compile("<ksrq>(2014-" + month + "-.+?)</ksrq>");
 		String ksrq = getKsrq(plan.getKskm());
@@ -145,6 +153,18 @@ public class Application {
 		applicationLog.close();
 		OcsClient.close();
 	}
+
+	//开始登录的时间
+	private static long getPrepare() {
+		Calendar calendar = new GregorianCalendar();
+		if(!isTest){
+			calendar.set(Calendar.HOUR_OF_DAY, 8);
+			calendar.set(Calendar.MINUTE, 55);
+			calendar.set(Calendar.SECOND, 0);
+			calendar.set(Calendar.MILLISECOND, 0);			
+		}
+		return calendar.getTimeInMillis();
+	}
 	
 	//开始检查考试计划的时间
 	private static long getStart() {
@@ -152,7 +172,7 @@ public class Application {
 		if(!isTest){
 			calendar.set(Calendar.HOUR_OF_DAY, 8);
 			calendar.set(Calendar.MINUTE, 59);
-			calendar.set(Calendar.SECOND, 50);
+			calendar.set(Calendar.SECOND, 0);
 			calendar.set(Calendar.MILLISECOND, 0);			
 		}
 		return calendar.getTimeInMillis();
@@ -162,7 +182,7 @@ public class Application {
 	private static long getEnd() {
 		Calendar calendar = new GregorianCalendar();
 		calendar.set(Calendar.HOUR_OF_DAY, 9);
-		calendar.set(Calendar.MINUTE, 40);
+		calendar.set(Calendar.MINUTE, 20);
 		calendar.set(Calendar.SECOND, 0);
 		calendar.set(Calendar.MILLISECOND, 0);
 		return calendar.getTimeInMillis();

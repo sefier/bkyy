@@ -50,7 +50,7 @@ public class Tab {
 	}
 	
 	public void retry(){
-		if(tries < 3){
+		if(tries < 10){
 			explorer.getExplorerLog().record("第" + tries + "次重试");
 			visit(request, true);
 		}

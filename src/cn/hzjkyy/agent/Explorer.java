@@ -119,7 +119,7 @@ public abstract class Explorer {
 					}				
 				}
 			}
-		}while(tries < 3);
+		}while(tries < 10);
 
     	response.getStatusPanel().finish(false);
     	explorerLog.record("请求接口：" + tab.getRequest().getJkid());
