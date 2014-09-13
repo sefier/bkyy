@@ -79,7 +79,7 @@ public class Application {
 
 		//获取考试日期
 		long end = getEnd();
-		int interval = 2000 / plan.getTotal();
+		int interval = 10000 / plan.getTotal();
 		String month = isTest ? "09" : "10";
 		Pattern ksrqPattern = Pattern.compile("<ksrq>(2014-" + month + "-.+?)</ksrq>");
 		String ksrq = getKsrq(plan.getKskm());
@@ -97,7 +97,7 @@ public class Application {
 			}
 			
 			try {
-				Thread.sleep(200);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 			}
 			Iterator<Tab> it = examTabs.iterator();

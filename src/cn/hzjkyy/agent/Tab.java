@@ -50,7 +50,7 @@ public class Tab {
 	}
 	
 	public void retry(){
-		if(tries < 10){
+		if(tries < 30){
 			explorer.getExplorerLog().record("第" + tries + "次重试");
 			visit(request, true);
 		}
@@ -62,6 +62,6 @@ public class Tab {
 	
 	public boolean isOver() {
 		int status = response.getStatusPanel().getStatus();
-		return status > 0 || status < 0 && tries >= 10;
+		return status > 0 || status < 0 && tries >= 30;
 	}
 }
