@@ -30,13 +30,13 @@ public class Tab {
 	}
 	
 	//访问，直至返回结果
-	public Response visit(Request request) {
+	public Response visit(Request request) throws UnloginException {
 		visit(request, false);
 		return this.response;
 	}
 	private int tries = 0;
 	//只是在浏览器中键入地址访问而已
-	public Tab visit(Request request, boolean async) {
+	public Tab visit(Request request, boolean async) throws UnloginException {
 		tries++;
 		response.clear();
 		request.setSentAt(System.currentTimeMillis());
@@ -49,7 +49,7 @@ public class Tab {
 		return this;
 	}
 	
-	public void retry(){
+	public void retry() throws UnloginException{
 		if(tries < 30){
 			explorer.getExplorerLog().record("第" + tries + "次重试");
 			visit(request, true);

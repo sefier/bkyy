@@ -19,7 +19,7 @@ import cn.hzjkyy.model.Request;
 import cn.hzjkyy.model.Response;
 import cn.hzjkyy.tool.Log;
 
-public abstract class Explorer {
+public class Explorer {
 	public void close() {
 		tabs.clear();
 		explorerLog.close();
@@ -84,7 +84,7 @@ public abstract class Explorer {
 	}
 	
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
-	void sendRequest(Tab tab) {
+	void sendRequest(Tab tab) throws UnloginException {
 		Request request = tab.getRequest();
 		//设定请求参数
 		List<NameValuePair> nvps = generateNvps(request);
@@ -103,9 +103,18 @@ public abstract class Explorer {
 		        
 		        int status = httpResponse.getStatusLine().getStatusCode();
 		        if (status >= 200 && status < 300){
-		        	response.getStatusPanel().success();
-		        	response.setResponseBody(EntityUtils.toString(httpResponse.getEntity()));
-		        	break;
+		        	String responseString = EntityUtils.toString(httpResponse.getEntity());
+		        	if(responseString.contains("JDBC")){
+			        	exceptionString = "JDBC异常:" + responseString;
+		        	}else if(responseString.contains("您的系统未在本地址正确注册")){
+			        	exceptionString = "未注册异常:" + responseString;
+		        	}else if(responseString.contains("登录已超时")){
+		        		throw new UnloginException();
+		        	}else{
+			        	response.getStatusPanel().success();
+			        	response.setResponseBody(responseString);
+			        	break;
+		        	}
 		        }else{
 		        	exceptionString = "Status:" + status + EntityUtils.toString(httpResponse.getEntity());
 		        }
@@ -119,7 +128,7 @@ public abstract class Explorer {
 					}				
 				}
 			}
-		}while(tries < 30);
+		}while(tries < 150);
 
     	response.getStatusPanel().finish(false);
     	explorerLog.record("请求接口：" + tab.getRequest().getJkid());
@@ -132,7 +141,7 @@ public abstract class Explorer {
     	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	}
 	
-	void sendAsyncRequest(Tab tab) {
+	void sendAsyncRequest(Tab tab) throws UnloginException {
 		sendRequest(tab);
 	}
 }

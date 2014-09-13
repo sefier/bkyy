@@ -7,7 +7,16 @@ public class User {
 	private String token;
 	private String sfzmmc;
 	private String kskm;
+	private String jlc;
 	
+	public String getJlc() {
+		return jlc;
+	}
+
+	public void setJlc(String jlc) {
+		this.jlc = jlc;
+	}
+
 	public String getKskm() {
 		return kskm;
 	}

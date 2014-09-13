@@ -46,12 +46,8 @@ public class PlanClient {
 	        	plan.setId(Integer.parseInt(getValue(response, "id")));
 	        	plan.setSfzmhm(getValue(response, "sfzmhm"));
 	        	plan.setPass(getValue(response, "pass"));
-	        	plan.setJlc(getValue(response, "jlc"));
-	        	plan.setKskm(getValue(response, "kskm"));
-	        	plan.setXm(getValue(response, "xm"));
 	        	plan.setKsdd(getValue(response, "ksdd"));
-	        	plan.setTotal(Integer.parseInt(getValue(response, "total")));
-	        	plan.setNumber(Integer.parseInt(getValue(response, "number")));
+	        	plan.setKsrq(getValue(response, "ksrq"));
 	        }
 		} catch (ParseException | IOException e) {
 		} finally {
@@ -68,13 +64,14 @@ public class PlanClient {
 	}
 	
 	public void report(Plan plan, String ksrq, boolean success) {
-		String serverUrl = "http://" + host + "/plans/" + plan.getId() + "/report";
+		String serverUrl = "http://" + getHost() + "/plans/" + plan.getId() + "/report";
 		HttpPost httpPost = new HttpPost(serverUrl);
 		CloseableHttpResponse httpResponse = null;
 				
 		try {
 			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
-			nvps.add(new BasicNameValuePair("attend_at", success ? ksrq : ""));
+			nvps.add(new BasicNameValuePair("ksrq", ksrq));
+			nvps.add(new BasicNameValuePair("success", new Boolean(success).toString()));
             httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 	        httpResponse = httpclient.execute(httpPost);
 		} catch (ParseException | IOException e) {

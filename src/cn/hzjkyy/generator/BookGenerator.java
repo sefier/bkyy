@@ -8,11 +8,9 @@ import cn.hzjkyy.model.User;
 
 public class BookGenerator extends Generator {
 	private User user;
-	private String jlc;
 	private Exam exam;
-	public BookGenerator(User user, String jlc, Exam exam) {
+	public BookGenerator(User user, Exam exam) {
 		this.user = user;
-		this.jlc = jlc;
 		this.exam = exam;
 	}
 
@@ -42,7 +40,7 @@ public class BookGenerator extends Generator {
 				.append("</token><kscc>")
 				.append(exam.kscc)
 				.append("</kscc><hphm>")
-				.append(URLEncoder.encode(jlc, "UTF-8"))
+				.append(URLEncoder.encode(user.getJlc(), "UTF-8"))
 				.append("</hphm><ly>A</ly></WriteCondition></root>")
 				.toString();
 		} catch (UnsupportedEncodingException e) {
