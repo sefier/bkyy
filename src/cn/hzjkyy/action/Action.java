@@ -129,13 +129,13 @@ public class Action {
 
 		//获取考试流水
 		actionLog.record("系统开始获取考试流水。");
-		JlcGenerator jlkGenerator = new JlcGenerator(user);
-		Request jlkRequest = jlkGenerator.generate();
+		JlcGenerator jlcGenerator = new JlcGenerator(user);
+		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
 		do {
 			actionLog.record("获取考试流水...");
-			Response response = tab.visit(jlkRequest);
+			Response response = tab.visit(jlcRequest);
 			if(response.getStatusPanel().isSuccess()){
 				jlcParser.parse(response.getResponseBody());
 			}

@@ -63,7 +63,7 @@ public class Log {
 	private String getFilePath() {
 		if(filePath == null){
 			String fileName = String.format("%s_%d_%s", dayDateFormat.format(new Date()), plan.getId(), name);
-			filePath = currentPath.resolve(fileName + ".txt").toString();
+			filePath = currentPath.resolve(fileName + ".log").toString();
 		}
 		
 		return filePath;

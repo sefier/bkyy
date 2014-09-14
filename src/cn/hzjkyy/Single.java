@@ -1,5 +1,7 @@
 package cn.hzjkyy;
 
+import java.util.Random;
+
 import cn.hzjkyy.action.Action;
 import cn.hzjkyy.agent.Explorer;
 import cn.hzjkyy.agent.PlanClient;
@@ -13,11 +15,25 @@ import cn.hzjkyy.tool.Log;
 
 public class Single {
 	public static void main(String[] args){
-		boolean isTest = false;
-		
-		//获取预约计划
-		PlanClient planClient = new PlanClient(isTest);
-		Plan plan = planClient.fetch();
+		boolean isTest = true;
+		Plan plan = new Plan();
+		if(isTest){
+		    java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINER);
+		    java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINER);
+
+		    System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
+		    System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
+		    System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire", "debug");
+		    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "debug");
+		    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.headers", "debug");
+			plan.setId(1);
+			plan.setKsdd("3301007");
+			plan.setSfzmhm("330102199308100610");
+			plan.setPass("408504");
+		}else{
+			PlanClient planClient = new PlanClient(isTest);
+			plan = planClient.fetch();
+		}
 		
 		//创建日志
 		Log.init(plan, isTest ? 1 : 5000);
@@ -32,7 +48,9 @@ public class Single {
 
 		Exam exam = null;
 		boolean success = false;
-		long end = action.getTimestamp(9, 40);
+	    Random rand = new Random();
+	    int randomNum = rand.nextInt(60000);
+		long end = action.getTimestamp(9, 40) + randomNum;
 
 		do {
 			try{
@@ -45,14 +63,16 @@ public class Single {
 					}while(exam == null && System.currentTimeMillis() < end);
 					
 					//预约
-					success = action.book(exam);
+					if(exam != null){
+						success = action.book(exam);						
+					}
 				}while(!success && System.currentTimeMillis() < end);			
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
 			}
 		}while(!success && System.currentTimeMillis() < end);
 		
-		planClient.report(plan, exam.ksrq, success);
+		//planClient.report(plan, exam == null ? "" : exam.ksrq, success);
 		action.close();
 		explorer.close();
 		applicationLog.close();

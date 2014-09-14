@@ -13,6 +13,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
 import cn.hzjkyy.model.Request;
@@ -47,7 +48,9 @@ public class Explorer {
 	public Explorer(){
 		//初始化浏览器请求信息
 		explorerLog = Log.getLog("explorer");
-		basicNvps.add(new BasicNameValuePair("xlh", "0C2B3243AFCB169B0E0C07533816A4D3"));		
+		basicNvps.add(new BasicNameValuePair("xlh", "0C2B3243AFCB169B0E0C07533816A4D3"));
+		httpPost.setHeader(HTTP.USER_AGENT, "car/1.1 CFNetwork/672.1.14 Darwin/14.0.0");
+
 	}
 	
 	private void setTimeout(int timeout){
@@ -99,9 +102,9 @@ public class Explorer {
 			tries++;
 			try {
 		        httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-		        httpResponse = httpclient.execute(httpPost);
-		        
-		        int status = httpResponse.getStatusLine().getStatusCode();
+			    httpResponse = httpclient.execute(httpPost);
+
+			    int status = httpResponse.getStatusLine().getStatusCode();
 		        if (status >= 200 && status < 300){
 		        	String responseString = EntityUtils.toString(httpResponse.getEntity());
 		        	if(responseString.contains("JDBC")){
