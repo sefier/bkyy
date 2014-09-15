@@ -35,7 +35,14 @@ public class Explorer {
 
 	protected int timeout;
 	protected Log explorerLog; 
+	private int limits = 1;
 	
+	public int getLimits() {
+		return limits;
+	}
+	public void setLimits(int limits) {
+		this.limits = limits;
+	}
 	public Log getExplorerLog() {
 		return explorerLog;
 	}
@@ -107,11 +114,12 @@ public class Explorer {
 			    int status = httpResponse.getStatusLine().getStatusCode();
 		        if (status >= 200 && status < 300){
 		        	String responseString = EntityUtils.toString(httpResponse.getEntity());
-		        	if(responseString.contains("JDBC")){
-			        	exceptionString = "JDBC异常:" + responseString;
-		        	}else if(responseString.contains("您的系统未在本地址正确注册")){
-			        	exceptionString = "未注册异常:" + responseString;
-		        	}else if(responseString.contains("登录已超时")){
+//		        	if(responseString.contains("JDBC")){
+//			        	exceptionString = "JDBC异常:" + responseString;
+//		        	}else if(responseString.contains("您的系统未在本地址正确注册")){
+//			        	exceptionString = "未注册异常:" + responseString;
+//		        	}else 
+		        	if(responseString.contains("登录已超时")){
 		        		throw new UnloginException();
 		        	}else{
 			        	response.getStatusPanel().success();
@@ -131,7 +139,7 @@ public class Explorer {
 					}				
 				}
 			}
-		}while(tries < 150);
+		}while(tries < getLimits());
 
     	response.getStatusPanel().finish(false);
     	explorerLog.record("请求接口：" + tab.getRequest().getJkid());
@@ -142,9 +150,5 @@ public class Explorer {
         	explorerLog.record("异常信息：" + exceptionString);    		
     	}
     	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
-	}
-	
-	void sendAsyncRequest(Tab tab) throws UnloginException {
-		sendRequest(tab);
 	}
 }

@@ -48,6 +48,7 @@ public class PlanClient {
 	        	plan.setPass(getValue(response, "pass"));
 	        	plan.setKsdd(getValue(response, "ksdd"));
 	        	plan.setKsrq(getValue(response, "ksrq"));
+	        	plan.setToken(getValue(response, "token"));
 	        }
 		} catch (ParseException | IOException e) {
 		} finally {

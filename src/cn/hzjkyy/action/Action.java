@@ -8,6 +8,7 @@ import cn.hzjkyy.agent.UnloginException;
 import cn.hzjkyy.generator.AgreeGenerator;
 import cn.hzjkyy.generator.BookGenerator;
 import cn.hzjkyy.generator.ExamGenerator;
+import cn.hzjkyy.generator.FrontGenerator;
 import cn.hzjkyy.generator.IdentityGenerator;
 import cn.hzjkyy.generator.JlcGenerator;
 import cn.hzjkyy.generator.LoginGenerator;
@@ -19,6 +20,7 @@ import cn.hzjkyy.model.Request;
 import cn.hzjkyy.model.Response;
 import cn.hzjkyy.model.User;
 import cn.hzjkyy.parser.ExamParser;
+import cn.hzjkyy.parser.FrontParser;
 import cn.hzjkyy.parser.JlcParser;
 import cn.hzjkyy.parser.LoginParser;
 import cn.hzjkyy.parser.LoginVerifyParser;
@@ -84,6 +86,22 @@ public class Action {
 		user.setToken(loginParser.getToken());
 		user.setSfzmmc(loginParser.getSfzmmc());
 		
+		//首页
+		actionLog.record("获取首页");
+		FrontGenerator frontGenerator = new FrontGenerator(user);
+		Request frontRequest = frontGenerator.generate();
+		FrontParser frontParser = new FrontParser();
+		do {
+			actionLog.record("获取首页中...");
+			Response response = tab.visit(frontRequest);
+			if(response.getStatusPanel().isSuccess()){
+				frontParser.parse(response.getResponseBody());					
+			}
+			
+		} while(!frontParser.getStatusPanel().isSuccess());
+		actionLog.record("首页获取成功");
+
+		
 		//登录验证
 		actionLog.record("进行登录验证");
 		LoginVerifyGenerator loginVerifyGenerator = new LoginVerifyGenerator(user);
@@ -98,7 +116,7 @@ public class Action {
 		} while(!loginVerifyParser.getStatusPanel().isSuccess());
 		actionLog.record("登录验证成功");
 
-		//登录验证
+		//身份验证
 		actionLog.record("进行身份验证");
 		IdentityGenerator identityGenerator = new IdentityGenerator(user);
 		Request identityRequest = identityGenerator.generate();
@@ -114,17 +132,22 @@ public class Action {
 	}
 	
 	public Exam detect() throws UnloginException {
+		user.setKskm(null);
 		actionLog.record("进行同意操作");
+		
 		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
 		Request agreeRequest = agreeGenerator.generate();
 		LoginVerifyParser agreeParser = new LoginVerifyParser();
-		do {
-			actionLog.record("同意中...");
-			Response response = tab.visit(agreeRequest);
-			if(response.getStatusPanel().isSuccess()){
-				agreeParser.parse(response.getResponseBody());					
-			}
-		} while(!agreeParser.getStatusPanel().isSuccess());
+		
+		actionLog.record("同意中...");
+		Response response = tab.visit(agreeRequest);
+		if(response.getStatusPanel().isSuccess()){
+			agreeParser.parse(response.getResponseBody());					
+		}
+		if(!agreeParser.getStatusPanel().isSuccess()){
+			actionLog.record("同意操作失败");
+			return null;
+		}
 		actionLog.record("同意操作成功");
 
 		//获取考试流水
@@ -133,13 +156,15 @@ public class Action {
 		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
-		do {
-			actionLog.record("获取考试流水...");
-			Response response = tab.visit(jlcRequest);
-			if(response.getStatusPanel().isSuccess()){
-				jlcParser.parse(response.getResponseBody());
-			}
-		}while(!jlcParser.getStatusPanel().isSuccess());
+		actionLog.record("获取考试流水...");
+		response = tab.visit(jlcRequest);
+		if(response.getStatusPanel().isSuccess()){
+			jlcParser.parse(response.getResponseBody());
+		}
+		if(!jlcParser.getStatusPanel().isSuccess()){
+			actionLog.record("获取考试流水失败");
+			return null;
+		}
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
 		user.setKskm(kskm);
@@ -153,7 +178,7 @@ public class Action {
 		ExamParser examParser = new ExamParser(plan);
 		
 		actionLog.record("获取考试信息...");
-		Response response = tab.visit(examRequest);
+		response = tab.visit(examRequest);
 		if(response.getStatusPanel().isSuccess()){
 			examParser.parse(response.getResponseBody());
 		}
