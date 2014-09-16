@@ -1,6 +1,7 @@
 package cn.hzjkyy.action;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import cn.hzjkyy.agent.Tab;
@@ -36,18 +37,22 @@ public class Action {
 	public void close() {
 		actionLog.close();
 	}
-	public Action waitUntil(int hour, int minute) {
+	public Action waitUntil(long timestamp){
+		actionLog.record("等待至：" + Log.dateFormat.format(new Date(timestamp)));
 		if(!isTest){
-			long prepare = getTimestamp(hour, minute);
-			while(System.currentTimeMillis() < prepare){
+			while(System.currentTimeMillis() < timestamp){
 				try {
 					Thread.sleep(100);
 				} catch (InterruptedException e) {
 				}
-			}			
+			}	
 		}
-		
+
 		return this;
+	}
+	public Action waitUntil(int hour, int minute) {
+		long timestamp = getTimestamp(hour, minute);
+		return waitUntil(timestamp);
 	}
 	
 	public long getTimestamp(int hour, int minute) {
@@ -132,22 +137,19 @@ public class Action {
 	}
 	
 	public Exam detect() throws UnloginException {
-		user.setKskm(null);
 		actionLog.record("进行同意操作");
 		
 		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
 		Request agreeRequest = agreeGenerator.generate();
 		LoginVerifyParser agreeParser = new LoginVerifyParser();
 		
-		actionLog.record("同意中...");
-		Response response = tab.visit(agreeRequest);
-		if(response.getStatusPanel().isSuccess()){
-			agreeParser.parse(response.getResponseBody());					
-		}
-		if(!agreeParser.getStatusPanel().isSuccess()){
-			actionLog.record("同意操作失败");
-			return null;
-		}
+		do {
+			actionLog.record("同意中...");
+			Response response = tab.visit(agreeRequest);
+			if(response.getStatusPanel().isSuccess()){
+				agreeParser.parse(response.getResponseBody());					
+			}			
+		}while(!agreeParser.getStatusPanel().isSuccess());
 		actionLog.record("同意操作成功");
 
 		//获取考试流水
@@ -156,15 +158,13 @@ public class Action {
 		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
-		actionLog.record("获取考试流水...");
-		response = tab.visit(jlcRequest);
-		if(response.getStatusPanel().isSuccess()){
-			jlcParser.parse(response.getResponseBody());
-		}
-		if(!jlcParser.getStatusPanel().isSuccess()){
-			actionLog.record("获取考试流水失败");
-			return null;
-		}
+		do {
+			actionLog.record("获取考试流水...");
+			Response response = tab.visit(jlcRequest);
+			if(response.getStatusPanel().isSuccess()){
+				jlcParser.parse(response.getResponseBody());
+			}			
+		}while(!jlcParser.getStatusPanel().isSuccess());		
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
 		user.setKskm(kskm);
@@ -177,20 +177,15 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan);
 		
-		actionLog.record("获取考试信息...");
-		response = tab.visit(examRequest);
-		if(response.getStatusPanel().isSuccess()){
-			examParser.parse(response.getResponseBody());
-		}
-		Exam exam = null;
-		if(examParser.getStatusPanel().isSuccess()){
-			exam = examParser.getExam();
-			actionLog.record("获取考试信息成功");
-		}else{
-			actionLog.record("获取考试信息失败");
-		}
+		do{
+			actionLog.record("获取考试信息...");
+			Response response = tab.visit(examRequest);
+			if(response.getStatusPanel().isSuccess()){
+				examParser.parse(response.getResponseBody());
+			}			
+		}while(!examParser.getStatusPanel().isSuccess());
 		
-		return exam;
+		return examParser.getExam();
 	}
 	
 	//预约

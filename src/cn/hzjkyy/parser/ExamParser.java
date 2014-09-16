@@ -29,21 +29,25 @@ public class ExamParser extends Parser{
 	public void parse(String response) {
 		clear();
 		
-		for(Pattern examPattern: patterns){
-			Matcher m = examPattern.matcher(response);
-			if (m.find()) {
-				String kscc = m.group(1);
-				String ksdd = m.group(2);
-				String ksrq = m.group(3);
-				
-				if(kscc.length() > 0 && ksdd.length() > 0 && ksrq.length() > 0){
-					exam = new Exam(kscc, ksdd, ksrq);
-					getStatusPanel().success();
-					break;
-				}
+		if(response.contains("<code>1</code>") || response.contains("该考点截止已无可用名额")){
+			getStatusPanel().success();
+			if(response.contains("<code>1</code>")){
+				for(Pattern examPattern: patterns){
+					Matcher m = examPattern.matcher(response);
+					if (m.find()) {
+						String kscc = m.group(1);
+						String ksdd = m.group(2);
+						String ksrq = m.group(3);
+						
+						if(kscc.length() > 0 && ksdd.length() > 0 && ksrq.length() > 0){
+							exam = new Exam(kscc, ksdd, ksrq);
+							break;
+						}
+					}
+				}				
 			}
+		}else{
+			getStatusPanel().error();
 		}
-		
-		getStatusPanel().finish(false);
 	}
 }

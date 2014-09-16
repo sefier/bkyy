@@ -7,6 +7,24 @@ public class Plan {
 	private String ksdd;
 	private String ksrq;
 	private String token;
+	private int number;
+	private int total;
+
+	public int getTotal() {
+		return total;
+	}
+
+	public void setTotal(int total) {
+		this.total = total;
+	}
+
+	public int getNumber() {
+		return number;
+	}
+
+	public void setNumber(int number) {
+		this.number = number;
+	}
 
 	public String getToken() {
 		return token;

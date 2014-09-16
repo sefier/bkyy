@@ -16,8 +16,8 @@ import cn.hzjkyy.tool.Log;
 public class Single {
 	public static void main(String[] args){
 		//程序运行环境
-		boolean isTest = true;
-		boolean debug = true;
+		boolean isTest = false;
+		boolean debug = false;
 		
 		if(debug){
 //		    java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINER);
@@ -38,6 +38,8 @@ public class Single {
 			plan.setKsdd("3301022");
 			plan.setSfzmhm("332502199110174570");
 			plan.setPass("520555");
+			plan.setNumber(0);
+			plan.setTotal(15);
 		}else{
 			plan = planClient.fetch();
 		}
@@ -50,40 +52,45 @@ public class Single {
 		User user = new User(plan.getSfzmhm(), plan.getPass());
 		Device device = new Device(plan.getToken());
 		Explorer explorer = new Explorer();
-		if(plan.getKsdd() == "3301007"){
-			explorer.setLimits(10);
-		}
 		Tab mainTab = explorer.newTab();
 		Action action = new Action(mainTab, user, device, plan, isTest);
 
 		Exam exam = null;
-		Exam fakeExam = new Exam("51", plan.getKsdd(), "2014-10-11");
 		boolean success = false;
 	    Random rand = new Random();
 	    int randomNum = rand.nextInt(60000);
-		long end = action.getTimestamp(13, 40) + randomNum;
+		long end = action.getTimestamp(9, 40) + randomNum;
+		int number = plan.getNumber();
+		int total = plan.getTotal();
+		if(isTest){
+			applicationLog.record("number:" + number);
+			applicationLog.record("total:" + total);			
+		}
+		long offset = number * 20000 - Math.min(6, Math.max(number - 3, 0)) * 10000;
+		long start = action.getTimestamp(8, 59) + offset;
+		long circle = total * 20000 - Math.min(6, Math.max(total - 3, 0)) * 10000;
 
 		do {
 			try{
 				//登录
-				action.waitUntil(8, 20).login();
-				do {
-					//获取考试信息
-					exam = action.waitUntil(8, 25).detect();
+				action.waitUntil(8, 55).login();
+
+				//获取考试信息
+				exam = action.waitUntil(start).detect();
 					
-					//预约
-					if(exam != null){
-						applicationLog.record("获取考试成功，预约考试");
-						success = action.book(exam);						
-					}else if(user.getKskm() != null){
-						applicationLog.record("获取考试失败，盲预约");
-						success = action.book(fakeExam);
-					}
-				}while(!success && System.currentTimeMillis() < end);			
+				//预约
+				if(exam != null){
+					applicationLog.record("获取考试成功，预约考试");
+					success = action.book(exam);						
+				}else{
+					applicationLog.record("获取考试失败");
+				}
+				
+				start += circle;
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
 			}
-		}while(!success && System.currentTimeMillis() < end);
+		}while(!success && start < end);
 		
 		planClient.report(plan, exam == null ? "" : exam.ksrq, success);
 		action.close();

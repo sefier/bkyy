@@ -19,7 +19,7 @@ import cn.hzjkyy.model.Plan;
 
 public class Log {
 	public static Path currentPath = Paths.get("").toAbsolutePath();
-	private static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+	public static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
 	private static DateFormat dayDateFormat = new SimpleDateFormat("yyyyMMdd");
 	private static List<Log> logs = new ArrayList<Log>();
 	private static int lineLimit;

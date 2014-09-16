@@ -35,7 +35,7 @@ public class Explorer {
 
 	protected int timeout;
 	protected Log explorerLog; 
-	private int limits = 1;
+	private int limits = 150;
 	
 	public int getLimits() {
 		return limits;
@@ -114,12 +114,11 @@ public class Explorer {
 			    int status = httpResponse.getStatusLine().getStatusCode();
 		        if (status >= 200 && status < 300){
 		        	String responseString = EntityUtils.toString(httpResponse.getEntity());
-//		        	if(responseString.contains("JDBC")){
-//			        	exceptionString = "JDBC异常:" + responseString;
-//		        	}else if(responseString.contains("您的系统未在本地址正确注册")){
-//			        	exceptionString = "未注册异常:" + responseString;
-//		        	}else 
-		        	if(responseString.contains("登录已超时")){
+		        	if(responseString.contains("JDBC")){
+			        	exceptionString = "JDBC异常:" + responseString;
+		        	}else if(responseString.contains("您的系统未在本地址正确注册")){
+			        	exceptionString = "未注册异常:" + responseString;
+		        	}else if(responseString.contains("登录已超时")){
 		        		throw new UnloginException();
 		        	}else{
 			        	response.getStatusPanel().success();

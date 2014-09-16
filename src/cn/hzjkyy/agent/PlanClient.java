@@ -49,6 +49,8 @@ public class PlanClient {
 	        	plan.setKsdd(getValue(response, "ksdd"));
 	        	plan.setKsrq(getValue(response, "ksrq"));
 	        	plan.setToken(getValue(response, "token"));
+	        	plan.setNumber(Integer.parseInt(getValue(response, "number")));
+	        	plan.setTotal(Integer.parseInt(getValue(response, "total")));
 	        }
 		} catch (ParseException | IOException e) {
 		} finally {
