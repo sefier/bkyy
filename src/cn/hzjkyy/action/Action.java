@@ -14,6 +14,7 @@ import cn.hzjkyy.generator.IdentityGenerator;
 import cn.hzjkyy.generator.JlcGenerator;
 import cn.hzjkyy.generator.LoginGenerator;
 import cn.hzjkyy.generator.LoginVerifyGenerator;
+import cn.hzjkyy.generator.ModifyGenerator;
 import cn.hzjkyy.model.Device;
 import cn.hzjkyy.model.Exam;
 import cn.hzjkyy.model.Plan;
@@ -25,6 +26,7 @@ import cn.hzjkyy.parser.FrontParser;
 import cn.hzjkyy.parser.JlcParser;
 import cn.hzjkyy.parser.LoginParser;
 import cn.hzjkyy.parser.LoginVerifyParser;
+import cn.hzjkyy.parser.ModifyParser;
 import cn.hzjkyy.tool.Log;
 
 public class Action {
@@ -72,6 +74,25 @@ public class Action {
 		this.isTest = isTest;
 	}
 	
+	public void changePass(String newPass) throws UnloginException{
+		actionLog.record("更改密码：" + user.getPass() + "=>" + newPass);
+		ModifyGenerator modifyGenerator = new ModifyGenerator(user, newPass);
+		Request modifyRequest = modifyGenerator.generate();
+		ModifyParser modifyParser = new ModifyParser();
+		
+		do {
+			actionLog.record("更改密码中...");
+			Response response = tab.visit(modifyRequest);
+			
+			if(response.getStatusPanel().isSuccess()){
+				modifyParser.parse(response.getResponseBody());
+			}
+		}while(!modifyParser.getStatusPanel().isSuccess());
+		
+		actionLog.record("更改密码成功");
+		user.setPass(newPass);
+	}
+	
 	public void login() throws UnloginException {
 		//登录
 		actionLog.record("登录：");
@@ -90,6 +111,9 @@ public class Action {
 		user.setXm(loginParser.getXm());
 		user.setToken(loginParser.getToken());
 		user.setSfzmmc(loginParser.getSfzmmc());
+	}
+	
+	public void front() throws UnloginException {
 		
 		//首页
 		actionLog.record("获取首页");
@@ -133,7 +157,7 @@ public class Action {
 				identityParser.parse(response.getResponseBody());					
 			}
 		} while(!identityParser.getStatusPanel().isSuccess());
-		actionLog.record("身份验证成功");
+		actionLog.record("身份验证成功");		
 	}
 	
 	public Exam detect() throws UnloginException {

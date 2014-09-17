@@ -10,6 +10,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -86,6 +87,35 @@ public class PlanClient {
 				}				
 			}
 		}
+	}
+	
+	public boolean over(){
+		boolean over = false;
+		String serverUrl = "http://" + getHost() + "/plans/over";
+		HttpGet httpGet = new HttpGet(serverUrl);
+		CloseableHttpResponse httpResponse = null;
+				
+		try {
+	        httpResponse = httpclient.execute(httpGet);
+	        int status = httpResponse.getStatusLine().getStatusCode();
+	        if (status >= 200 && status < 300){
+	        	String response = EntityUtils.toString(httpResponse.getEntity());
+	        	
+	        	if(response.contains("计划结束")){
+	        		over = true;
+	        	}
+	        }
+		} catch (ParseException | IOException e) {
+		} finally {
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (IOException e) {
+				}				
+			}
+		}
+		
+		return over;
 	}
 	
 	private String getValue(String response, String key){

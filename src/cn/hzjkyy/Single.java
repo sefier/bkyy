@@ -1,7 +1,5 @@
 package cn.hzjkyy;
 
-import java.util.Random;
-
 import cn.hzjkyy.action.Action;
 import cn.hzjkyy.agent.Explorer;
 import cn.hzjkyy.agent.PlanClient;
@@ -16,8 +14,8 @@ import cn.hzjkyy.tool.Log;
 public class Single {
 	public static void main(String[] args){
 		//程序运行环境
-		boolean isTest = false;
-		boolean debug = false;
+		boolean isTest = true;
+		boolean debug = true;
 		
 		if(debug){
 //		    java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINER);
@@ -36,8 +34,8 @@ public class Single {
 		if(debug){
 			plan.setId(1);
 			plan.setKsdd("3301022");
-			plan.setSfzmhm("332502199110174570");
-			plan.setPass("520555");
+			plan.setSfzmhm("332502199204116216");
+			plan.setPass("AnLu123");
 			plan.setNumber(0);
 			plan.setTotal(15);
 		}else{
@@ -57,26 +55,23 @@ public class Single {
 
 		Exam exam = null;
 		boolean success = false;
-	    Random rand = new Random();
-	    int randomNum = rand.nextInt(60000);
-		long end = action.getTimestamp(9, 40) + randomNum;
-		int number = plan.getNumber();
-		int total = plan.getTotal();
-		if(isTest){
-			applicationLog.record("number:" + number);
-			applicationLog.record("total:" + total);			
-		}
-		long offset = number * 20000 - Math.min(6, Math.max(number - 3, 0)) * 10000;
-		long start = action.getTimestamp(8, 59) + offset;
-		long circle = total * 20000 - Math.min(6, Math.max(total - 3, 0)) * 10000;
+		String newPass = "181745";
 
+		try {
+			action.login();
+			action.changePass(newPass);
+		} catch (UnloginException e1) {
+		}
+
+		action.waitUntil(8, 59);
 		do {
 			try{
 				//登录
-				action.waitUntil(8, 55).login();
+				action.login();
+				action.front();
 
 				//获取考试信息
-				exam = action.waitUntil(start).detect();
+				exam = action.detect();
 					
 				//预约
 				if(exam != null){
@@ -86,11 +81,15 @@ public class Single {
 					applicationLog.record("获取考试失败");
 				}
 				
-				start += circle;
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
 			}
-		}while(!success && start < end);
+		}while(!success && !planClient.over());
+		
+		try {
+			action.changePass(plan.getPass());
+		} catch (UnloginException e) {
+		}
 		
 		planClient.report(plan, exam == null ? "" : exam.ksrq, success);
 		action.close();
