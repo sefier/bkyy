@@ -15,7 +15,7 @@ public class Oss {
     // 初始化一个OSSClient
     OSSClient client = new OSSClient(accessKeyId, accessKeySecret);
     
-    public void upload(File file){
+    public void uploadAs(File file, String name){
 	    InputStream content;
 		try {
 			content = new FileInputStream(file);
@@ -25,9 +25,12 @@ public class Oss {
 		    meta.setContentLength(file.length());
 
 		    // 上传Object.
-		    client.putObject("hzjkyy", file.getName(), content, meta);
+		    client.putObject("hzjkyy", name, content, meta);
 		} catch (FileNotFoundException e) {
 		}
-
+    }
+    
+    public void upload(File file){
+    	uploadAs(file, file.getName());
     }
 }

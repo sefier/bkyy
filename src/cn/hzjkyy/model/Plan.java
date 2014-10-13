@@ -5,34 +5,9 @@ public class Plan {
 	private String sfzmhm;
 	private String pass;
 	private String ksdd;
-	private String ksrq;
-	private String token;
-	private int number;
-	private int total;
+	private String startKsrq;
+	private String endKsrq;
 
-	public int getTotal() {
-		return total;
-	}
-
-	public void setTotal(int total) {
-		this.total = total;
-	}
-
-	public int getNumber() {
-		return number;
-	}
-
-	public void setNumber(int number) {
-		this.number = number;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
 
 	public int getId() {
 		return id;
@@ -58,12 +33,20 @@ public class Plan {
 		this.pass = pass;
 	}
 
-	public String getKsrq() {
-		return ksrq;
+	public String getStartKsrq() {
+		return startKsrq;
 	}
 
-	public void setKsrq(String ksrq) {
-		this.ksrq = ksrq;
+	public void setStartKsrq(String startKsrq) {
+		this.startKsrq = startKsrq;
+	}
+	
+	public String getEndKsrq() {
+		return endKsrq;
+	}
+
+	public void setEndKsrq(String endKsrq) {
+		this.endKsrq = endKsrq;
 	}
 
 	public String getKsdd() {

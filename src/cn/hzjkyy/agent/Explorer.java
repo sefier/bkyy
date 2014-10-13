@@ -16,6 +16,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.model.Request;
 import cn.hzjkyy.model.Response;
 import cn.hzjkyy.tool.Log;
@@ -35,7 +36,7 @@ public class Explorer {
 
 	protected int timeout;
 	protected Log explorerLog; 
-	private int limits = 150;
+	private int limits = 300;
 	
 	public int getLimits() {
 		return limits;
@@ -48,13 +49,15 @@ public class Explorer {
 	}
 	public Explorer(String name){
 		//初始化浏览器请求信息
-		explorerLog = Log.getLog("explorer" + "-" + name);
+		explorerLog = Log.getLog(plan, "explorer" + "-" + name);
 		basicNvps.add(new BasicNameValuePair("xlh", "0C2B3243AFCB169B0E0C07533816A4D3"));		
 	}
 	
-	public Explorer(){
+	private Plan plan;
+	public Explorer(Plan plan){
+		this.plan = plan;
 		//初始化浏览器请求信息
-		explorerLog = Log.getLog("explorer");
+		explorerLog = Log.getLog(plan, "explorer");
 		basicNvps.add(new BasicNameValuePair("xlh", "0C2B3243AFCB169B0E0C07533816A4D3"));
 		httpPost.setHeader(HTTP.USER_AGENT, "car/1.1 CFNetwork/672.1.14 Darwin/14.0.0");
 
@@ -68,8 +71,8 @@ public class Explorer {
 		httpPost.setConfig(params);
 	}
 	
-	public Explorer(int timeout){
-		this();
+	public Explorer(Plan plan, int timeout){
+		this(plan);
 		setTimeout(timeout);
 	}
 	
@@ -107,6 +110,8 @@ public class Explorer {
 		int tries = 0;
 		do{
 			tries++;
+			request.setSentAt(System.currentTimeMillis());
+			exceptionString = null;
 			try {
 		        httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 			    httpResponse = httpclient.execute(httpPost);

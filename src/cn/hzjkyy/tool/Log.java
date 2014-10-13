@@ -23,21 +23,28 @@ public class Log {
 	private static DateFormat dayDateFormat = new SimpleDateFormat("yyyyMMdd");
 	private static List<Log> logs = new ArrayList<Log>();
 	private static int lineLimit;
-	private static Plan plan;
+	private Plan plan;
 	
-	public static void init(Plan plan1, int lineLimit1){
-		plan = plan1;
+	public synchronized Plan getPlan(){
+		return this.plan;
+	}
+	
+	public static synchronized void init(int lineLimit1){
 		lineLimit = lineLimit1;
 	}
 	
-	public static Log getLog(String name) {
+	public synchronized static Log getLog(Plan plan, String name) {
+		if(plan == null){
+			System.out.println(name);
+		}
 		for(Log log : logs) {
-			if(log.getName() == name){
+			if(log.getName() == name
+					&& log.getPlan().getId() == plan.getId()){
 				return log;
 			}
 		}
 		
-		Log log = new Log(name);
+		Log log = new Log(name, plan);
 		logs.add(log);
 		return log;
 	}
@@ -51,8 +58,9 @@ public class Log {
 	    return baos.toString();
 	}
 
-	private Log(String name) {
+	private Log(String name, Plan plan) {
 		this.name = name;
+		this.plan = plan;
 	}
 	private String name;
 	private String getName() {

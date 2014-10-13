@@ -1,100 +1,83 @@
 package cn.hzjkyy;
 
-import cn.hzjkyy.action.Action;
-import cn.hzjkyy.agent.Explorer;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import cn.hzjkyy.agent.PlanClient;
-import cn.hzjkyy.agent.Tab;
-import cn.hzjkyy.agent.UnloginException;
-import cn.hzjkyy.model.Device;
-import cn.hzjkyy.model.Exam;
 import cn.hzjkyy.model.Plan;
-import cn.hzjkyy.model.User;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
+	public static long endTimeStamp = getTimestamp(9, 45);
+	public static String programVersion = "1013";
 	public static void main(String[] args){
 		//程序运行环境
-		boolean isTest = true;
-		boolean debug = true;
-		
-		if(debug){
-//		    java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINER);
-//		    java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINER);
-//
-//		    System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
-//		    System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
-//		    System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire", "debug");
-//		    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "debug");
-//		    System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.headers", "debug");
-		}
+		boolean isTest = false;
+		serverLog("程序启动，版本号：" + programVersion + (isTest ? "测试版" : "正式版"));
 
 		PlanClient planClient = new PlanClient(isTest);
-		Plan plan = new Plan();
 		
-		if(debug){
-			plan.setId(1);
-			plan.setKsdd("3301022");
-			plan.setSfzmhm("332502199204116216");
-			plan.setPass("AnLu123");
-			plan.setNumber(0);
-			plan.setTotal(15);
-		}else{
-			plan = planClient.fetch();
-		}
-		
-		//创建日志
-		Log.init(plan, isTest ? 1 : 5000);
-		Log applicationLog = Log.getLog("application");
-		
-		//初始化
-		User user = new User(plan.getSfzmhm(), plan.getPass());
-		Device device = new Device(plan.getToken());
-		Explorer explorer = new Explorer();
-		Tab mainTab = explorer.newTab();
-		Action action = new Action(mainTab, user, device, plan, isTest);
-
-		Exam exam = null;
-		boolean success = false;
-		String newPass = "181745";
-
-		try {
-			action.login();
-			action.changePass(newPass);
-		} catch (UnloginException e1) {
-		}
-
-		action.waitUntil(8, 59);
+		//向服务器报到
+		int serverId = -1;
 		do {
 			try{
-				//登录
-				action.login();
-				action.front();
-
-				//获取考试信息
-				exam = action.detect();
-					
-				//预约
-				if(exam != null){
-					applicationLog.record("获取考试成功，预约考试");
-					success = action.book(exam);						
-				}else{
-					applicationLog.record("获取考试失败");
-				}
-				
-			}catch(UnloginException ex){
-				applicationLog.record("未登录错误");
-			}
-		}while(!success && !planClient.over());
+				String world = planClient.hello();
+				serverLog("向服务器报到，收到编号：" + world);
+				serverId = Integer.parseInt(world);			
+			}catch(NumberFormatException e){
+				serverLog("编号解析异常");
+			}			
+		}while(serverId <= 0);
+		serverLog("服务器报到结束，编号：" + serverId);
 		
-		try {
-			action.changePass(plan.getPass());
-		} catch (UnloginException e) {
+		//向服务器获取预约计划
+		waitUntil(getTimestamp(8, 50) + (serverId % 100) * 1200);
+		serverLog("向服务器获取预约计划");
+		ArrayList<Plan> plans = new ArrayList<Plan>();
+		do {
+			serverLog("获取中...");
+			plans = planClient.fetch(serverId);
+		}while(plans.isEmpty());
+		serverLog("我们共获取" + plans.size() + "个计划");
+		
+		//将计划付诸于实施
+		for(Plan plan : plans){
+			serverLog("启动计划" + plan.getId());
+			(new BookThread(planClient, plan, isTest)).start();
 		}
-		
-		planClient.report(plan, exam == null ? "" : exam.ksrq, success);
-		action.close();
-		explorer.close();
-		applicationLog.close();
 	}
 	
+	public static void serverLog(String message){		
+		System.out.println("[" + Log.dateFormat.format(new Date()) + "]" + message);
+	}
+	
+	public static void quit(){
+		System.exit(0);
+	}
+
+	public static void waitUntil(long timestamp){
+		while(System.currentTimeMillis() < timestamp){
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+
+	}
+
+	public static void waitUntil(int hour, int minute) {
+		long timestamp = getTimestamp(hour, minute);
+		waitUntil(timestamp);
+	}
+	
+	public static long getTimestamp(int hour, int minute) {
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(Calendar.HOUR_OF_DAY, hour);
+		calendar.set(Calendar.MINUTE, minute);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTimeInMillis();
+	}
 }

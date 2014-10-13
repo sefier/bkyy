@@ -4,9 +4,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import cn.hzjkyy.Single;
 import cn.hzjkyy.agent.Tab;
 import cn.hzjkyy.agent.UnloginException;
-import cn.hzjkyy.generator.AgreeGenerator;
 import cn.hzjkyy.generator.BookGenerator;
 import cn.hzjkyy.generator.ExamGenerator;
 import cn.hzjkyy.generator.FrontGenerator;
@@ -35,7 +35,7 @@ public class Action {
 	private Device device;
 	private Plan plan;
 	private boolean isTest;
-	protected Log actionLog = Log.getLog("action"); 
+	protected Log actionLog; 
 	public void close() {
 		actionLog.close();
 	}
@@ -72,6 +72,7 @@ public class Action {
 		this.device = device;
 		this.plan = plan;
 		this.isTest = isTest;
+		actionLog = Log.getLog(plan, "action");
 	}
 	
 	public void changePass(String newPass) throws UnloginException{
@@ -161,20 +162,20 @@ public class Action {
 	}
 	
 	public Exam detect() throws UnloginException {
-		actionLog.record("进行同意操作");
-		
-		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
-		Request agreeRequest = agreeGenerator.generate();
-		LoginVerifyParser agreeParser = new LoginVerifyParser();
-		
-		do {
-			actionLog.record("同意中...");
-			Response response = tab.visit(agreeRequest);
-			if(response.getStatusPanel().isSuccess()){
-				agreeParser.parse(response.getResponseBody());					
-			}			
-		}while(!agreeParser.getStatusPanel().isSuccess());
-		actionLog.record("同意操作成功");
+//		actionLog.record("进行同意操作");
+//		
+//		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
+//		Request agreeRequest = agreeGenerator.generate();
+//		LoginVerifyParser agreeParser = new LoginVerifyParser();
+//		
+//		do {
+//			actionLog.record("同意中...");
+//			Response response = tab.visit(agreeRequest);
+//			if(response.getStatusPanel().isSuccess()){
+//				agreeParser.parse(response.getResponseBody());					
+//			}			
+//		}while(!agreeParser.getStatusPanel().isSuccess());
+//		actionLog.record("同意操作成功");
 
 		//获取考试流水
 		actionLog.record("系统开始获取考试流水。");
@@ -187,7 +188,10 @@ public class Action {
 			Response response = tab.visit(jlcRequest);
 			if(response.getStatusPanel().isSuccess()){
 				jlcParser.parse(response.getResponseBody());
-			}			
+			}
+			if(System.currentTimeMillis() > Single.endTimeStamp){
+				return null;
+			}
 		}while(!jlcParser.getStatusPanel().isSuccess());		
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();

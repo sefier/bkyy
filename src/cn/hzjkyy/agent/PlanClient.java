@@ -17,6 +17,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 
+import cn.hzjkyy.Single;
 import cn.hzjkyy.model.Plan;
 
 public class PlanClient {
@@ -31,27 +32,21 @@ public class PlanClient {
 	private String getHost(){
 		return isTest ? testHost : host;
 	}
-
-	public Plan fetch() {
-    	Plan plan = new Plan();
-		String serverUrl = "http://" + getHost() + "/plans/fetch";
+	
+	public String hello() {
+		String serverUrl = "http://" + getHost() + "/plans/hello";
 		HttpPost httpPost = new HttpPost(serverUrl);
 		CloseableHttpResponse httpResponse = null;
 				
 		try {
+			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
+			nvps.add(new BasicNameValuePair("program_version", Single.programVersion));
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 	        httpResponse = httpclient.execute(httpPost);
 	        
 	        int status = httpResponse.getStatusLine().getStatusCode();
 	        if (status >= 200 && status < 300){
-	        	String response = EntityUtils.toString(httpResponse.getEntity());
-	        	plan.setId(Integer.parseInt(getValue(response, "id")));
-	        	plan.setSfzmhm(getValue(response, "sfzmhm"));
-	        	plan.setPass(getValue(response, "pass"));
-	        	plan.setKsdd(getValue(response, "ksdd"));
-	        	plan.setKsrq(getValue(response, "ksrq"));
-	        	plan.setToken(getValue(response, "token"));
-	        	plan.setNumber(Integer.parseInt(getValue(response, "number")));
-	        	plan.setTotal(Integer.parseInt(getValue(response, "total")));
+	        	return EntityUtils.toString(httpResponse.getEntity());
 	        }
 		} catch (ParseException | IOException e) {
 		} finally {
@@ -63,8 +58,52 @@ public class PlanClient {
 			}
 		}
 		
-		return plan;
+		return null;
+	}
 
+	public ArrayList<Plan> fetch(int serverId) {
+		ArrayList<Plan> plans = new ArrayList<Plan>();
+		String serverUrl = "http://" + getHost() + "/plans/fetch";
+		HttpPost httpPost = new HttpPost(serverUrl);
+		CloseableHttpResponse httpResponse = null;
+				
+		try {
+			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
+			nvps.add(new BasicNameValuePair("server_id", "" + serverId));
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+	        httpResponse = httpclient.execute(httpPost);
+	        
+	        int status = httpResponse.getStatusLine().getStatusCode();
+	        if (status >= 200 && status < 300){
+	        	String response = EntityUtils.toString(httpResponse.getEntity());
+	        	
+	        	String[] plansString = response.split("phantom");
+	        	
+	        	for(String planString : plansString){
+	        		if(planString.trim().length() <= 0){
+	        			continue;
+	        		}
+	        		Plan plan = new Plan();
+		        	plan.setId(Integer.parseInt(getValue(planString, "id")));
+		        	plan.setSfzmhm(getValue(planString, "sfzmhm"));
+		        	plan.setPass(getValue(planString, "pass"));
+		        	plan.setKsdd(getValue(planString, "ksdd"));
+		        	plan.setStartKsrq(getValue(planString, "start_ksrq"));
+		        	plan.setEndKsrq(getValue(planString, "end_ksrq"));
+		        	plans.add(plan);
+	        	}
+	        }
+		} catch (ParseException | IOException e) {
+		} finally {
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (IOException e) {
+				}				
+			}
+		}
+		
+		return plans;
 	}
 	
 	public void report(Plan plan, String ksrq, boolean success) {
