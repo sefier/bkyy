@@ -35,7 +35,7 @@ public class BookThread extends Thread {
 
 		Exam exam = null;
 		boolean success = false;
-		String newPass = "AnLu123";
+		String newPass = "880121";
 
 		action.waitUntil(8, 59);
 		try {
@@ -74,7 +74,9 @@ public class BookThread extends Thread {
 		}while(!success && System.currentTimeMillis() < Single.endTimeStamp);
 		
 		try {
-			action.changePass(plan.getPass());
+			if(!success){
+				action.changePass(plan.getPass());				
+			}
 		} catch (UnloginException e) {
 		}
 		
