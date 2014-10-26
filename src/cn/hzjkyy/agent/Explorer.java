@@ -36,7 +36,7 @@ public class Explorer {
 
 	protected int timeout;
 	protected Log explorerLog; 
-	private int limits = 300;
+	private int limits = 30000000;
 	
 	public int getLimits() {
 		return limits;

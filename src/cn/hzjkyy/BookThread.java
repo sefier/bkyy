@@ -37,19 +37,14 @@ public class BookThread extends Thread {
 		boolean success = false;
 		String newPass = "880121";
 
-		action.waitUntil(8, 59);
 		try {
 			action.login();
 			action.changePass(newPass);
-		} catch (UnloginException e1) {
-		}
-
-		action.waitUntil(9, 0);
-		//登录
-		try {
 			action.login();
 		} catch (UnloginException e1) {
 		}
+		
+		action.waitUntil(9, 0);
 		do {
 			try{
 				//获取考试信息

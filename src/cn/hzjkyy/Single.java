@@ -10,8 +10,8 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static long endTimeStamp = getTimestamp(9, 45);
-	public static String programVersion = "1014";
+	public static long endTimeStamp = getTimestamp(9, 15);
+	public static String programVersion = "1027";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
@@ -33,7 +33,7 @@ public class Single {
 		serverLog("服务器报到结束，编号：" + serverId);
 		
 		//向服务器获取预约计划
-		waitUntil(getTimestamp(8, 50) + (serverId % 100) * 1200);
+		waitUntil(getTimestamp(8, 47) + (serverId % 100) * 1200);
 		serverLog("向服务器获取预约计划");
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
