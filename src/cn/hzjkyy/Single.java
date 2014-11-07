@@ -10,8 +10,8 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static long endTimeStamp = getTimestamp(9, 45);
-	public static String programVersion = "1014";
+	public static long endTimeStamp = getTimestamp(9, 10);
+	public static String programVersion = "1108";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
@@ -42,7 +42,6 @@ public class Single {
 		}while(plans.isEmpty());
 		serverLog("我们共获取" + plans.size() + "个计划");
 		
-		//将计划付诸于实施
 		for(Plan plan : plans){
 			serverLog("启动计划" + plan.getId());
 			(new BookThread(planClient, plan, isTest)).start();

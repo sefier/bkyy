@@ -3,6 +3,8 @@ package cn.hzjkyy.agent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
@@ -125,6 +127,35 @@ public class Explorer {
 			        	exceptionString = "未注册异常:" + responseString;
 		        	}else if(responseString.contains("登录已超时")){
 		        		throw new UnloginException();
+		        	}else if(responseString.contains("后再按确定按钮") || responseString.contains("秒后再按预约按钮")){
+		        		exceptionString = responseString;
+		        		Pattern p1 = Pattern.compile("请\\[(\\d+)\\]秒后再按确定按钮");
+		        		Pattern p2 = Pattern.compile("请\\[(\\d+)\\]秒后再按预约按钮");
+		        		Matcher m1 = p1.matcher(responseString);
+		        		Matcher m2 = p2.matcher(responseString);
+		        		String value = null;
+		        		if (m1.find()) {
+		        			value = m1.group(1);
+		        		}else if(m2.find()){
+		        			value = m2.group(1);
+		        		}
+		        		
+		        		if(value == null){
+		        			value = "32";
+		        		}
+		        		
+		        		if(value != null){
+		        			try {
+		        				int sleep = Integer.parseInt(value) + 1;		        				
+		        				int second = sleep * 1000;
+		        				
+								Thread.sleep(second);
+							} catch (NumberFormatException e) {
+							} catch (InterruptedException e) {
+							}		        			
+		        		}
+		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
+		        		System.exit(1);
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
@@ -143,6 +174,8 @@ public class Explorer {
 					}				
 				}
 			}
+			
+			explorerLog.record("异常信息：" + exceptionString); 
 		}while(tries < getLimits());
 
     	response.getStatusPanel().finish(false);

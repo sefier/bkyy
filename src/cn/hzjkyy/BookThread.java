@@ -1,8 +1,5 @@
 package cn.hzjkyy;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import cn.hzjkyy.action.Action;
 import cn.hzjkyy.agent.Explorer;
 import cn.hzjkyy.agent.PlanClient;
@@ -38,21 +35,20 @@ public class BookThread extends Thread {
 
 		Exam exam = null;
 		boolean success = false;
-		String newPass = null;
+		String newPass = "880121";
 		
-		Pattern p = Pattern.compile("(\\d{17})");
-		Matcher m = p.matcher(plan.getSfzmhm());
-		if (m.find()) {
-			String value = m.group(1);
-			int first = Integer.parseInt(value.substring(0, 6));
-			int middle = Integer.parseInt(value.substring(6, 12));
-			int last = Integer.parseInt(value.substring(12, 17));
-			int result = (first + middle + 1000000 - last) % 1000000;
-			newPass = "" + result;
-		}
+//		Pattern p = Pattern.compile("(\\d{17})");
+//		Matcher m = p.matcher(plan.getSfzmhm());
+//		if (m.find()) {
+//			String value = m.group(1);
+//			int first = Integer.parseInt(value.substring(0, 6));
+//			int middle = Integer.parseInt(value.substring(6, 12));
+//			int last = Integer.parseInt(value.substring(12, 17));
+//			int result = (first + middle + 1000000 - last) % 1000000;
+//			newPass = "" + result;
+//		}
 		
 		if(newPass != null){
-			action.waitUntil(8, 59);
 			try {
 				action.login();
 				action.changePass(newPass);
