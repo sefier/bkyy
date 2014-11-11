@@ -52,16 +52,12 @@ public class BookThread extends Thread {
 			try {
 				action.login();
 				action.changePass(newPass);
+				action.login();
 			} catch (UnloginException e1) {
 			}			
 		}
 
-		action.waitUntil(9, 0);
-		//登录
-		try {
-			action.login();
-		} catch (UnloginException e1) {
-		}
+		action.waitUntil(9, 1);
 		do {
 			try{
 				//获取考试信息
