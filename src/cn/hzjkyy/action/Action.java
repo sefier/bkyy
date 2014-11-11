@@ -224,7 +224,7 @@ public class Action {
 
 		Response response = tab.visit(bookRequest);
 
-		if(response.getStatusPanel().isSuccess() && response.getResponseBody().contains("您已预约成功")){
+		if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功") || response.getResponseBody().contains("重复预约"))){
 			actionLog.record("预约考试成功！");
 			return true;
 		}

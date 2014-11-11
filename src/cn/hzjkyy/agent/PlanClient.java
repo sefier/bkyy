@@ -114,7 +114,7 @@ public class PlanClient {
 		try {
 			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
 			nvps.add(new BasicNameValuePair("ksrq", ksrq));
-			nvps.add(new BasicNameValuePair("success", new Boolean(success).toString()));
+			nvps.add(new BasicNameValuePair("success", success ? "2" : "3"));
             httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 	        httpResponse = httpclient.execute(httpPost);
 		} catch (ParseException | IOException e) {
