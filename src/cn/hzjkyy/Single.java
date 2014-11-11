@@ -11,7 +11,7 @@ import cn.hzjkyy.tool.Log;
 
 public class Single {
 	public static long endTimeStamp = getTimestamp(9, 10);
-	public static String programVersion = "1108";
+	public static String programVersion = "1112";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
