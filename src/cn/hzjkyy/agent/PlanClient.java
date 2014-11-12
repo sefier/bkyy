@@ -128,21 +128,18 @@ public class PlanClient {
 		}
 	}
 	
-	public boolean over(){
-		boolean over = false;
-		String serverUrl = "http://" + getHost() + "/plans/over";
+	public int over(int serverId){
+		int over = 0;
+		String serverUrl = "http://" + getHost() + "/plans/over?server_id=" + serverId;
 		HttpGet httpGet = new HttpGet(serverUrl);
 		CloseableHttpResponse httpResponse = null;
 				
-		try {
+		try {			
 	        httpResponse = httpclient.execute(httpGet);
 	        int status = httpResponse.getStatusLine().getStatusCode();
 	        if (status >= 200 && status < 300){
 	        	String response = EntityUtils.toString(httpResponse.getEntity());
-	        	
-	        	if(response.contains("计划结束")){
-	        		over = true;
-	        	}
+	        	over = Integer.parseInt(response);
 	        }
 		} catch (ParseException | IOException e) {
 		} finally {

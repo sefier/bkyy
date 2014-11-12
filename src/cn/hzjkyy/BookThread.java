@@ -2,6 +2,8 @@ package cn.hzjkyy;
 
 import cn.hzjkyy.action.Action;
 import cn.hzjkyy.agent.Explorer;
+import cn.hzjkyy.agent.PauseException;
+import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.agent.Tab;
 import cn.hzjkyy.agent.UnloginException;
@@ -52,43 +54,58 @@ public class BookThread extends Thread {
 			try {
 				action.login();
 				action.changePass(newPass);
-				action.login();
-			} catch (UnloginException e1) {
+			} catch (UnloginException | PauseException | StopException e) {
 			}			
 		}
 
-		action.waitUntil(9, 1);
+		String ksrq = "";
 		do {
 			try{
-				//获取考试信息
-				exam = action.detect();
-					
-				//预约
-				if(exam != null){
-					applicationLog.record("获取考试成功，预约考试");
-					success = action.book(exam);						
-				}else{
-					applicationLog.record("获取考试失败");
-				}
+				do {
+			    	int status = Single.status();
+			    	if(status == 0){
+			    		try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+						}
+			    	}else if(status == 1){
+			    		break;
+			    	}else if(status == 2){
+			    		throw new StopException();
+			    	}
+				}while(true);
+
+				action.login();
 				
+				do {
+					//获取考试信息
+					exam = action.detect();
+						
+					//预约
+					if(exam != null){
+						ksrq = exam.ksrq;
+						applicationLog.record("获取考试成功，预约考试");
+						success = action.book(exam);						
+					}else{
+						applicationLog.record("获取考试失败");
+					}
+				}while(!success);
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
-				//登录
-				try {
-					action.login();
-				} catch (UnloginException e1) {
-				}
+			}catch(PauseException pe){
+			}catch(StopException se){
+				break;
 			}
-		}while(!success && System.currentTimeMillis() < Single.endTimeStamp);
+		}while(!success);
 		
 		try {
 			if(!success && newPass != null){
 				action.changePass(plan.getPass());				
 			}
-		} catch (UnloginException e) {
+		} catch (UnloginException | PauseException | StopException e) {
 		}
 		
-		planClient.report(plan, exam == null ? "" : exam.ksrq, success);
+		planClient.report(plan, ksrq, success);
 		action.close();
 		explorer.close();
 		applicationLog.close();

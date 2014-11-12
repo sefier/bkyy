@@ -4,7 +4,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-import cn.hzjkyy.Single;
+import cn.hzjkyy.agent.PauseException;
+import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.Tab;
 import cn.hzjkyy.agent.UnloginException;
 import cn.hzjkyy.generator.BookGenerator;
@@ -75,7 +76,7 @@ public class Action {
 		actionLog = Log.getLog(plan, "action");
 	}
 	
-	public void changePass(String newPass) throws UnloginException{
+	public void changePass(String newPass) throws UnloginException, PauseException, StopException{
 		actionLog.record("更改密码：" + user.getPass() + "=>" + newPass);
 		ModifyGenerator modifyGenerator = new ModifyGenerator(user, newPass);
 		Request modifyRequest = modifyGenerator.generate();
@@ -94,7 +95,7 @@ public class Action {
 		user.setPass(newPass);
 	}
 	
-	public void login() throws UnloginException {
+	public void login() throws PauseException, StopException {
 		//登录
 		actionLog.record("登录：");
 		LoginGenerator loginGenerator = new LoginGenerator(user, device);
@@ -103,9 +104,13 @@ public class Action {
 
 		do {
 			actionLog.record("登录中...");
-			Response response = tab.visit(loginRequest);
-			if(response.getStatusPanel().isSuccess()){
-				loginParser.parse(response.getResponseBody());					
+			Response response;
+			try {
+				response = tab.visit(loginRequest);
+				if(response.getStatusPanel().isSuccess()){
+					loginParser.parse(response.getResponseBody());					
+				}
+			} catch (UnloginException e) {
 			}
 		} while(!loginParser.getStatusPanel().isSuccess());
 		actionLog.record("登录成功");
@@ -114,8 +119,7 @@ public class Action {
 		user.setSfzmmc(loginParser.getSfzmmc());
 	}
 	
-	public void front() throws UnloginException {
-		
+	public void front() throws UnloginException, PauseException, StopException {
 		//首页
 		actionLog.record("获取首页");
 		FrontGenerator frontGenerator = new FrontGenerator(user);
@@ -161,7 +165,7 @@ public class Action {
 		actionLog.record("身份验证成功");		
 	}
 	
-	public Exam detect() throws UnloginException {
+	public Exam detect() throws UnloginException, PauseException, StopException {
 //		actionLog.record("进行同意操作");
 //		
 //		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
@@ -189,9 +193,6 @@ public class Action {
 			if(response.getStatusPanel().isSuccess()){
 				jlcParser.parse(response.getResponseBody());
 			}
-			if(System.currentTimeMillis() > Single.endTimeStamp){
-				return null;
-			}
 		}while(!jlcParser.getStatusPanel().isSuccess());		
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
@@ -217,7 +218,7 @@ public class Action {
 	}
 	
 	//预约
-	public boolean book(Exam exam) throws UnloginException {
+	public boolean book(Exam exam) throws UnloginException, PauseException, StopException {
 		actionLog.record("开始预约考试：");
 		BookGenerator bookGenerator = new BookGenerator(user, exam);
 		Request bookRequest = bookGenerator.generate();

@@ -18,6 +18,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 
+import cn.hzjkyy.Single;
 import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.model.Request;
 import cn.hzjkyy.model.Response;
@@ -99,7 +100,7 @@ public class Explorer {
 	}
 	
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
-	void sendRequest(Tab tab) throws UnloginException {
+	void sendRequest(Tab tab) throws UnloginException, PauseException, StopException {
 		Request request = tab.getRequest();
 		//设定请求参数
 		List<NameValuePair> nvps = generateNvps(request);
@@ -176,6 +177,15 @@ public class Explorer {
 			}
 			
 			explorerLog.record("异常信息：" + exceptionString); 
+	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
+	    	
+	    	//检查服务器指令
+	    	int status = Single.status();
+	    	if(status == 0){
+	    		throw new PauseException();
+	    	}else if(status == 2){
+	    		throw new StopException();
+	    	}
 		}while(tries < getLimits());
 
     	response.getStatusPanel().finish(false);

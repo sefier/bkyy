@@ -10,8 +10,7 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static long endTimeStamp = getTimestamp(9, 10);
-	public static String programVersion = "1112";
+	public static String programVersion = "1113";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
@@ -46,12 +45,30 @@ public class Single {
 			serverLog("启动计划" + plan.getId());
 			(new BookThread(planClient, plan, isTest)).start();
 		}
+		
+		do {
+			status = planClient.over(serverId);
+			
+			if(status == 2){
+				break;
+			}else{
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+				}
+			}
+		}while(true);
 	}
 	
 	public static void serverLog(String message){		
 		System.out.println("[" + Log.dateFormat.format(new Date()) + "]" + message);
 	}
 	
+	private static int status = 0;
+	public static synchronized int status(){
+		return status;
+	}
+
 	public static void quit(){
 		System.exit(0);
 	}
