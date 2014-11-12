@@ -36,6 +36,11 @@ public class Single {
 		serverLog("向服务器获取预约计划");
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+
 			serverLog("获取中...");
 			plans = planClient.fetch(serverId);
 		}while(plans.isEmpty());
@@ -53,7 +58,7 @@ public class Single {
 				break;
 			}else{
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(30000);
 				} catch (InterruptedException e) {
 				}
 			}

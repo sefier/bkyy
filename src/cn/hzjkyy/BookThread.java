@@ -52,12 +52,14 @@ public class BookThread extends Thread {
 		
 		if(newPass != null){
 			try {
+				explorer.setCheckingMode(false);
 				action.login();
 				action.changePass(newPass);
 			} catch (UnloginException | PauseException | StopException e) {
 			}			
 		}
-
+		
+		explorer.setCheckingMode(true);
 		String ksrq = "";
 		do {
 			try{
@@ -100,6 +102,7 @@ public class BookThread extends Thread {
 		
 		try {
 			if(!success && newPass != null){
+				explorer.setCheckingMode(false);
 				action.changePass(plan.getPass());				
 			}
 		} catch (UnloginException | PauseException | StopException e) {

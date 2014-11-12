@@ -99,6 +99,10 @@ public class Explorer {
 		return nvps;
 	}
 	
+	private boolean checkingMode = true;
+	public void setCheckingMode(boolean checkingMode){
+		this.checkingMode = checkingMode;
+	}
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
 	void sendRequest(Tab tab) throws UnloginException, PauseException, StopException {
 		Request request = tab.getRequest();
@@ -112,6 +116,16 @@ public class Explorer {
 
 		int tries = 0;
 		do{
+	    	//检查服务器指令
+			if(checkingMode){
+		    	int serverStatus = Single.status();
+		    	if(serverStatus == 0){
+		    		throw new PauseException();
+		    	}else if(serverStatus == 2){
+		    		throw new StopException();
+		    	}				
+			}
+
 			tries++;
 			request.setSentAt(System.currentTimeMillis());
 			exceptionString = null;
@@ -177,15 +191,7 @@ public class Explorer {
 			}
 			
 			explorerLog.record("异常信息：" + exceptionString); 
-	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
-	    	
-	    	//检查服务器指令
-	    	int status = Single.status();
-	    	if(status == 0){
-	    		throw new PauseException();
-	    	}else if(status == 2){
-	    		throw new StopException();
-	    	}
+	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));	    	
 		}while(tries < getLimits());
 
     	response.getStatusPanel().finish(false);
