@@ -10,7 +10,7 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static String programVersion = "1113";
+	public static String programVersion = "1115";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
@@ -51,16 +51,24 @@ public class Single {
 			(new BookThread(planClient, plan, isTest)).start();
 		}
 		
+		int size = plans.size();
+		waitUntil(getTimestamp(9, 0) + (serverId % 200) * 1000);
 		do {
-			status = planClient.over(serverId);
+			int signal = planClient.over();
 			
-			if(status == 2){
+			if(signal == 1){//紧急状态
+				status = 1;
+			}else if(status == 2){//恢复正常状态
+				int index = (int)(System.currentTimeMillis() / (5 * 60 * 10000) % size);
+				status = plans.get(index).getId();
+			}else if(status == 3){//停止状态
+				status = 3;
 				break;
-			}else{
-				try {
-					Thread.sleep(30000);
-				} catch (InterruptedException e) {
-				}
+			}
+
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
 			}
 		}while(true);
 	}

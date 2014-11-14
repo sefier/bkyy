@@ -56,7 +56,7 @@ public class BookThread extends Thread {
 				action.login();
 				action.changePass(newPass);
 			} catch (UnloginException | PauseException | StopException e) {
-			}			
+			}		
 		}
 		
 		explorer.setCheckingMode(true);

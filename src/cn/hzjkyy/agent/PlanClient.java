@@ -128,9 +128,9 @@ public class PlanClient {
 		}
 	}
 	
-	public int over(int serverId){
+	public int over(){
 		int over = 0;
-		String serverUrl = "http://" + getHost() + "/plans/over?server_id=" + serverId;
+		String serverUrl = "http://" + getHost() + "/signal.txt";
 		HttpGet httpGet = new HttpGet(serverUrl);
 		CloseableHttpResponse httpResponse = null;
 				
