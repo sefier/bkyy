@@ -65,30 +65,33 @@ public class BookThread extends Thread {
 			try{
 				do {
 			    	int status = Single.status();
-			    	if(status == 0){
+			    	
+			    	if(status == 1 || status == plan.getId()){
+			    		break;
+			    	}else if(status == 3){
+			    		throw new StopException();
+			    	}else{
 			    		try {
 							Thread.sleep(1000);
 						} catch (InterruptedException e) {
-						}
-			    	}else if(status == 1){
-			    		break;
-			    	}else if(status == 2){
-			    		throw new StopException();
+						}			    		
 			    	}
 				}while(true);
 
 				action.login();
-				//获取考试信息
-				exam = action.detect();
-					
-				//预约
-				if(exam != null){
-					ksrq = exam.ksrq;
-					applicationLog.record("获取考试成功，预约考试");
-					success = action.book(exam);						
-				}else{
-					applicationLog.record("获取考试失败");
-				}
+				do {
+					//获取考试信息
+					exam = action.detect();
+						
+					//预约
+					if(exam != null){
+						ksrq = exam.ksrq;
+						applicationLog.record("获取考试成功，预约考试");
+						success = action.book(exam);						
+					}else{
+						applicationLog.record("获取考试失败");
+					}					
+				}while(!success);
 					
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
