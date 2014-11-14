@@ -119,10 +119,11 @@ public class Explorer {
 	    	//检查服务器指令
 			if(checkingMode){
 		    	int serverStatus = Single.status();
-		    	if(serverStatus == 0){
-		    		throw new PauseException();
-		    	}else if(serverStatus == 2){
+		    	
+		    	if(serverStatus == 3){
 		    		throw new StopException();
+		    	}else if(serverStatus != 1 && serverStatus != plan.getId()){
+		    		throw new PauseException();
 		    	}				
 			}
 
@@ -170,7 +171,9 @@ public class Explorer {
 							}		        			
 		        		}
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
-		        		System.exit(1);
+		        		throw new StopException();
+		        	}else if(responseString.contains("你的操作已超时")){
+		        		throw new PauseException();
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
