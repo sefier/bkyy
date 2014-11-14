@@ -59,7 +59,7 @@ public class Single {
 			if(signal == 1){//紧急状态
 				status = 1;
 			}else if(status == 2){//恢复正常状态
-				int index = (int)(System.currentTimeMillis() / (5 * 60 * 10000) % size);
+				int index = (int)(System.currentTimeMillis() / (8 * 60 * 10000) % size);
 				status = plans.get(index).getId();
 			}else if(status == 3){//停止状态
 				status = 3;

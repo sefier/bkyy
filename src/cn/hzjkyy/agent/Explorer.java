@@ -115,6 +115,7 @@ public class Explorer {
 		String exceptionString = null;
 
 		int tries = 0;
+		long tryStartAt = System.currentTimeMillis();
 		do{
 	    	//检查服务器指令
 			if(checkingMode){
@@ -174,6 +175,8 @@ public class Explorer {
 		        		throw new StopException();
 		        	}else if(responseString.contains("你的操作已超时")){
 		        		throw new PauseException();
+		        	}else if(responseString.contains("该考点截止已无可用名额")){
+		        		throw new PauseException();
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
@@ -194,7 +197,11 @@ public class Explorer {
 			}
 			
 			explorerLog.record("异常信息：" + exceptionString); 
-	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));	    	
+	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
+	    	
+	    	if(System.currentTimeMillis() - tryStartAt > 4 * 60 * 1000){
+	    		throw new PauseException();
+	    	}
 		}while(tries < getLimits());
 
     	response.getStatusPanel().finish(false);
