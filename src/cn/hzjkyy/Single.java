@@ -58,14 +58,14 @@ public class Single {
 			
 			if(signal == 1){//紧急状态
 				status = 1;
-			}else if(status == 2){//恢复正常状态
-				int index = (int)(System.currentTimeMillis() / (8 * 60 * 10000) % size);
-				status = plans.get(index).getId();
-			}else if(status == 3){//停止状态
+			}else if(signal == 3){//停止状态
 				status = 3;
 				break;
+			}else if(signal == 2){
+				status = 0;
 			}
-
+			
+			reAssignStatus(plans, size);
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
@@ -73,13 +73,29 @@ public class Single {
 		}while(true);
 	}
 	
+	public static void reAssignStatus(ArrayList<Plan> plans, int size){
+		if(status != 1 && status != 3){
+			if(status == 0 || System.currentTimeMillis() - statusAssignAt > 8 * 60 * 1000){
+				lastIndex = (lastIndex + 1) % size;
+				statusAssignAt = System.currentTimeMillis();
+				status = plans.get(lastIndex).getId();
+			}			
+		}
+	}
+	
 	public static void serverLog(String message){		
 		System.out.println("[" + Log.dateFormat.format(new Date()) + "]" + message);
 	}
 	
 	private static int status = 0;
+	private static int lastIndex = -1;
+	private static long statusAssignAt;
 	public static synchronized int status(){
 		return status;
+	}
+	
+	public static synchronized void setStatus(int serverStatus){
+		 status = serverStatus;
 	}
 
 	public static void quit(){

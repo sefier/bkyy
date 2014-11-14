@@ -104,7 +104,7 @@ public class Explorer {
 		this.checkingMode = checkingMode;
 	}
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
-	void sendRequest(Tab tab) throws UnloginException, PauseException, StopException {
+	void sendRequest(Tab tab) throws UnloginException, PauseException, StopException, NextException {
 		Request request = tab.getRequest();
 		//设定请求参数
 		List<NameValuePair> nvps = generateNvps(request);
@@ -176,7 +176,7 @@ public class Explorer {
 		        	}else if(responseString.contains("你的操作已超时")){
 		        		throw new PauseException();
 		        	}else if(responseString.contains("该考点截止已无可用名额")){
-		        		throw new PauseException();
+		        		throw new NextException();
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
@@ -200,7 +200,7 @@ public class Explorer {
 	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	    	
 	    	if(System.currentTimeMillis() - tryStartAt > 4 * 60 * 1000){
-	    		throw new PauseException();
+	    		throw new NextException();
 	    	}
 		}while(tries < getLimits());
 
