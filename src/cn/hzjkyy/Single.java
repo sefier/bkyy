@@ -13,7 +13,7 @@ public class Single {
 	public static String programVersion = "1115";
 	public static void main(String[] args){
 		//程序运行环境
-		boolean isTest = true;
+		boolean isTest = false;
 		serverLog("程序启动，版本号：" + programVersion + (isTest ? "测试版" : "正式版"));
 
 		PlanClient planClient = new PlanClient(isTest);
