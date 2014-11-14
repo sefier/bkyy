@@ -61,7 +61,7 @@ public class Single {
 			}else if(signal == 3){//停止状态
 				status = 3;
 				break;
-			}else if(signal == 2){
+			}else if(signal == 2 && status == 1){
 				status = 0;
 			}
 			
