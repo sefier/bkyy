@@ -13,7 +13,7 @@ public class Single {
 	public static String programVersion = "1115";
 	public static void main(String[] args){
 		//程序运行环境
-		boolean isTest = false;
+		boolean isTest = true;
 		serverLog("程序启动，版本号：" + programVersion + (isTest ? "测试版" : "正式版"));
 
 		PlanClient planClient = new PlanClient(isTest);
@@ -75,7 +75,7 @@ public class Single {
 	
 	public static void reAssignStatus(ArrayList<Plan> plans, int size){
 		if(status != 1 && status != 3){
-			if(status == 0 || System.currentTimeMillis() - statusAssignAt > 8 * 60 * 1000){
+			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 8 * 60 * 1000)){
 				lastIndex = (lastIndex + 1) % size;
 				statusAssignAt = System.currentTimeMillis();
 				status = plans.get(lastIndex).getId();
