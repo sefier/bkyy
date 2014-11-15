@@ -67,7 +67,7 @@ public class Single {
 			
 			reAssignStatus(plans, size);
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(30000);
 			} catch (InterruptedException e) {
 			}
 		}while(true);
