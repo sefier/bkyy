@@ -118,15 +118,13 @@ public class Explorer {
 		long tryStartAt = System.currentTimeMillis();
 		do{
 	    	//检查服务器指令
-			if(checkingMode){
-		    	int serverStatus = Single.status();
-		    	
-		    	if(serverStatus == 3){
-		    		throw new StopException("服务器指示：3");
-		    	}else if(serverStatus != 1 && serverStatus != plan.getId()){
-		    		throw new PauseException("服务器指示：" + serverStatus);
-		    	}				
-			}
+	    	int serverStatus = Single.status();
+	    	
+	    	if(serverStatus == 3){
+	    		throw new StopException("服务器指示：3");
+	    	}else if(checkingMode && serverStatus != 1 && serverStatus != plan.getId()){
+	    		throw new PauseException("服务器指示：" + serverStatus);
+	    	}				
 
 			tries++;
 			request.setSentAt(System.currentTimeMillis());
