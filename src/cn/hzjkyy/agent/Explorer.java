@@ -176,7 +176,7 @@ public class Explorer {
 		        	}else if(responseString.contains("你的操作已超时")){
 		        		throw new PauseException("操作超时");
 		        	}else if(responseString.contains("该考点截止已无可用名额")){
-		        		throw new NextException("考点无名额");
+		        		throw new PauseException("考点无名额");
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
@@ -200,7 +200,7 @@ public class Explorer {
 	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	    	
 	    	if(System.currentTimeMillis() - tryStartAt > 5 * 60 * 1000){
-	    		throw new NextException("请求超时");
+	    		throw new PauseException("请求超时");
 	    	}
 		}while(tries < getLimits());
 
