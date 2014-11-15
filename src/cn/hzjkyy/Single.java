@@ -32,7 +32,7 @@ public class Single {
 		serverLog("服务器报到结束，编号：" + serverId);
 		
 		//向服务器获取预约计划
-		waitUntil(getTimestamp(8, 50) + (serverId % 100) * 1200);
+		waitUntil(getTimestamp(8, 30) + (serverId % 100) * 1200);
 		serverLog("向服务器获取预约计划");
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
