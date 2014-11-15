@@ -172,7 +172,7 @@ public class Explorer {
 							}		        			
 		        		}
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
-		        		throw new StopException("访问过于频繁");
+		        		throw new NextException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
 		        		throw new PauseException("操作超时");
 		        	}else if(responseString.contains("该考点截止已无可用名额")){

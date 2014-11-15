@@ -3,10 +3,13 @@ package cn.hzjkyy.action;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.hzjkyy.agent.NextException;
 import cn.hzjkyy.agent.PauseException;
 import cn.hzjkyy.agent.StopException;
+import cn.hzjkyy.agent.SuccessException;
 import cn.hzjkyy.agent.Tab;
 import cn.hzjkyy.agent.UnloginException;
 import cn.hzjkyy.generator.BookGenerator;
@@ -166,7 +169,7 @@ public class Action {
 		actionLog.record("身份验证成功");		
 	}
 	
-	public Exam detect() throws UnloginException, PauseException, StopException, NextException {
+	public Exam detect() throws UnloginException, PauseException, StopException, NextException, SuccessException {
 //		actionLog.record("进行同意操作");
 //		
 //		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
@@ -192,11 +195,18 @@ public class Action {
 			actionLog.record("获取考试流水...");
 			Response response = tab.visit(jlcRequest);
 			if(response.getStatusPanel().isSuccess()){
+				if(response.getResponseBody().contains("不能重复预约")){
+					Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
+					Matcher m = ksrqPattern.matcher(response.getResponseBody());
+					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+				}
 				jlcParser.parse(response.getResponseBody());
 			}
 		}while(!jlcParser.getStatusPanel().isSuccess());		
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
+		
+		
 		user.setKskm(kskm);
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
@@ -219,14 +229,20 @@ public class Action {
 	}
 	
 	//预约
-	public boolean book(Exam exam) throws UnloginException, PauseException, StopException, NextException {
+	public boolean book(Exam exam) throws UnloginException, PauseException, StopException, NextException, SuccessException {
 		actionLog.record("开始预约考试：");
 		BookGenerator bookGenerator = new BookGenerator(user, exam);
 		Request bookRequest = bookGenerator.generate();
 
 		Response response = tab.visit(bookRequest);
+		
+		if(response.getResponseBody().contains("重复预约")){
+			Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
+			Matcher m = ksrqPattern.matcher(response.getResponseBody());
+			throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+		}
 
-		if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功") || response.getResponseBody().contains("重复预约"))){
+		if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
 			actionLog.record("预约考试成功！");
 			return true;
 		}

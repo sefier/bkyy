@@ -52,7 +52,9 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(9, 0) + (serverId % 200) * 1000);
+		//将1/4的号放到十点
+		int hour = serverId % 4 == 0 ? 10 : 9;
+		waitUntil(getTimestamp(hour, 0) + (serverId % 200) * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);

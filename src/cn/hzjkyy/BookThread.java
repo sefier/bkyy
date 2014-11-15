@@ -6,6 +6,7 @@ import cn.hzjkyy.agent.NextException;
 import cn.hzjkyy.agent.PauseException;
 import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.PlanClient;
+import cn.hzjkyy.agent.SuccessException;
 import cn.hzjkyy.agent.Tab;
 import cn.hzjkyy.agent.UnloginException;
 import cn.hzjkyy.model.Device;
@@ -106,6 +107,9 @@ public class BookThread extends Thread {
 			}catch(StopException se){
 				applicationLog.record("停止预约：" + se.getReason());
 				break;
+			} catch (SuccessException se) {
+				success = true;
+				ksrq = se.getKsrq();
 			}
 		}while(!success);
 		
