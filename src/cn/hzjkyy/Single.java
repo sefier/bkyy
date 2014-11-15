@@ -54,6 +54,7 @@ public class Single {
 		int size = plans.size();
 		//将1/4的号放到十点
 		int hour = serverId % 4 == 0 ? 10 : 9;
+		serverLog("等候至" + hour);
 		waitUntil(getTimestamp(hour, 0) + (serverId % 200) * 1000);
 		do {
 			int signal = planClient.over();

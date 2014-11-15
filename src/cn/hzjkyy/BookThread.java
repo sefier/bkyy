@@ -70,12 +70,13 @@ public class BookThread extends Thread {
 			    	applicationLog.record("服务器指令" + status);
 			    	
 			    	if(status == 1 || status == plan.getId()){
-			    		applicationLog.record("预约等待中");
+			    		applicationLog.record("开始预约");
 			    		break;
 			    	}else if(status == 3){
 			    		throw new StopException("中心服务器指示：3");
 			    	}else{
 			    		try {
+			    			applicationLog.record("预约等待中");
 							Thread.sleep(5000);
 						} catch (InterruptedException e) {
 						}   		
@@ -100,9 +101,11 @@ public class BookThread extends Thread {
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
 			}catch(PauseException pe){
-				applicationLog.record("重新开始循环" + pe.getReason());
+				applicationLog.record("重新开始循环：" + pe.getReason());
 			}catch(NextException ne){
-				Single.setStatus(0);
+				if(Single.status() == plan.getId()){
+					Single.setStatus(0);					
+				}
 				applicationLog.record("进入下一个账号：" + ne.getReason());
 			}catch(StopException se){
 				applicationLog.record("停止预约：" + se.getReason());
