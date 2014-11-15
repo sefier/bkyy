@@ -55,6 +55,7 @@ public class Single {
 		waitUntil(getTimestamp(9, 0) + (serverId % 200) * 1000);
 		do {
 			int signal = planClient.over();
+			serverLog("获取中心服务器信号：" + signal);
 			
 			if(signal == 1){//紧急状态
 				status = 1;
@@ -66,6 +67,7 @@ public class Single {
 			}
 			
 			reAssignStatus(plans, size);
+			serverLog("生成服务器指令：" + status);
 			try {
 				Thread.sleep(30000);
 			} catch (InterruptedException e) {

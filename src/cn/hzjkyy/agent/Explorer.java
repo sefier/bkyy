@@ -122,9 +122,9 @@ public class Explorer {
 		    	int serverStatus = Single.status();
 		    	
 		    	if(serverStatus == 3){
-		    		throw new StopException();
+		    		throw new StopException("服务器指示：3");
 		    	}else if(serverStatus != 1 && serverStatus != plan.getId()){
-		    		throw new PauseException();
+		    		throw new PauseException("服务器指示：" + serverStatus);
 		    	}				
 			}
 
@@ -172,11 +172,11 @@ public class Explorer {
 							}		        			
 		        		}
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
-		        		throw new StopException();
+		        		throw new StopException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
-		        		throw new PauseException();
+		        		throw new PauseException("操作超时");
 		        	}else if(responseString.contains("该考点截止已无可用名额")){
-		        		throw new NextException();
+		        		throw new NextException("考点无名额");
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
@@ -200,7 +200,7 @@ public class Explorer {
 	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	    	
 	    	if(System.currentTimeMillis() - tryStartAt > 5 * 60 * 1000){
-	    		throw new NextException();
+	    		throw new NextException("请求超时");
 	    	}
 		}while(tries < getLimits());
 
