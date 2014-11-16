@@ -126,8 +126,8 @@ public class BookThread extends Thread {
 //		} catch (UnloginException | PauseException | StopException | NextException e) {
 //		}
 		
-		planClient.report(plan, ksrq, success);
 		Single.finishPlan(plan.getId());
+		planClient.report(plan, ksrq, success);
 		action.close();
 		explorer.close();
 		applicationLog.close();
