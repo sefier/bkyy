@@ -173,8 +173,8 @@ public class Explorer {
 		        		throw new NextException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
 		        		throw new PauseException("操作超时");
-		        	}else if(responseString.contains("该考点截止已无可用名额")){
-		        		throw new PauseException("考点无名额");
+		        	}else if(responseString.contains("该考点截止已无可用名额") || responseString.contains("更换其他时间")){
+		        		throw new NextException("考点无名额");
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
