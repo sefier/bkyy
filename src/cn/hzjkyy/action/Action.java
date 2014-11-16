@@ -6,8 +6,8 @@ import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.hzjkyy.agent.NextException;
 import cn.hzjkyy.agent.PauseException;
+import cn.hzjkyy.agent.RetryException;
 import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.SuccessException;
 import cn.hzjkyy.agent.Tab;
@@ -80,7 +80,7 @@ public class Action {
 		actionLog = Log.getLog(plan, "action");
 	}
 	
-	public void changePass(String newPass) throws UnloginException, PauseException, StopException, NextException{
+	public void changePass(String newPass) throws UnloginException, RetryException, StopException, PauseException{
 		actionLog.record("更改密码：" + user.getPass() + "=>" + newPass);
 		ModifyGenerator modifyGenerator = new ModifyGenerator(user, newPass);
 		Request modifyRequest = modifyGenerator.generate();
@@ -99,7 +99,7 @@ public class Action {
 		user.setPass(newPass);
 	}
 	
-	public void login() throws PauseException, StopException, NextException {
+	public void login() throws RetryException, StopException, PauseException {
 		//登录
 		actionLog.record("登录：");
 		LoginGenerator loginGenerator = new LoginGenerator(user, device);
@@ -123,7 +123,7 @@ public class Action {
 		user.setSfzmmc(loginParser.getSfzmmc());
 	}
 	
-	public void front() throws UnloginException, PauseException, StopException, NextException {
+	public void front() throws UnloginException, RetryException, StopException, PauseException {
 		//首页
 		actionLog.record("获取首页");
 		FrontGenerator frontGenerator = new FrontGenerator(user);
@@ -169,7 +169,7 @@ public class Action {
 		actionLog.record("身份验证成功");		
 	}
 	
-	public Exam detect() throws UnloginException, PauseException, StopException, NextException, SuccessException {
+	public Exam detect() throws UnloginException, RetryException, StopException, PauseException, SuccessException {
 //		actionLog.record("进行同意操作");
 //		
 //		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
@@ -229,7 +229,7 @@ public class Action {
 	}
 	
 	//预约
-	public boolean book(Exam exam) throws UnloginException, PauseException, StopException, NextException, SuccessException {
+	public boolean book(Exam exam) throws UnloginException, RetryException, StopException, PauseException, SuccessException {
 		actionLog.record("开始预约考试：");
 		BookGenerator bookGenerator = new BookGenerator(user, exam);
 		Request bookRequest = bookGenerator.generate();

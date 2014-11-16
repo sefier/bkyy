@@ -30,7 +30,7 @@ public class Tab {
 	}
 	
 	//访问，直至返回结果
-	public Response visit(Request request) throws UnloginException, PauseException, StopException, NextException {
+	public Response visit(Request request) throws UnloginException, RetryException, StopException, PauseException {
 		response.clear();
 		request.setSentAt(System.currentTimeMillis());
 		this.request = request;

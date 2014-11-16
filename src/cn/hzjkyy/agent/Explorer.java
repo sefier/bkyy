@@ -104,7 +104,7 @@ public class Explorer {
 		this.checkingMode = checkingMode;
 	}
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
-	void sendRequest(Tab tab) throws UnloginException, PauseException, StopException, NextException {
+	void sendRequest(Tab tab) throws UnloginException, RetryException, StopException, PauseException {
 		Request request = tab.getRequest();
 		//设定请求参数
 		List<NameValuePair> nvps = generateNvps(request);
@@ -123,7 +123,7 @@ public class Explorer {
 	    	if(serverStatus == 3){
 	    		throw new StopException("服务器指示：3");
 	    	}else if(checkingMode && serverStatus != 1 && serverStatus != plan.getId()){
-	    		throw new PauseException("服务器指示：" + serverStatus);
+	    		throw new RetryException("服务器指示：" + serverStatus);
 	    	}				
 
 			tries++;
@@ -172,9 +172,9 @@ public class Explorer {
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
 		        		throw new StopException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
-		        		throw new PauseException("操作超时");
+		        		throw new RetryException("操作超时");
 		        	}else if(responseString.contains("该考点截止已无可用名额") || responseString.contains("更换其他时间")){
-		        		throw new NextException("考点无名额");
+		        		throw new PauseException("考点无名额");
 		        	}else if(responseString.contains("密码错误")){
 		        		throw new StopException("密码错误");
 		        	}else{
@@ -200,7 +200,7 @@ public class Explorer {
 	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	    	
 	    	if(System.currentTimeMillis() - tryStartAt > 5 * 60 * 1000){
-	    		throw new PauseException("请求超时");
+	    		throw new RetryException("请求超时");
 	    	}
 		}while(tries < getLimits());
 

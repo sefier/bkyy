@@ -71,6 +71,7 @@ public class Single {
 			
 			for(int i = 0; i < 3; i++){
 				reAssignStatus(plans, size);
+				serverLog("重新生成服务器指令：" + status);
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {

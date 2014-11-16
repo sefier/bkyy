@@ -2,8 +2,8 @@ package cn.hzjkyy;
 
 import cn.hzjkyy.action.Action;
 import cn.hzjkyy.agent.Explorer;
-import cn.hzjkyy.agent.NextException;
 import cn.hzjkyy.agent.PauseException;
+import cn.hzjkyy.agent.RetryException;
 import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.agent.SuccessException;
@@ -57,7 +57,7 @@ public class BookThread extends Thread {
 				explorer.setCheckingMode(false);
 				action.login();
 				action.changePass(newPass);
-			} catch (UnloginException | PauseException | StopException | NextException e) {
+			} catch (UnloginException | RetryException | StopException | PauseException e) {
 			}		
 		}
 		
@@ -102,9 +102,9 @@ public class BookThread extends Thread {
 					
 			}catch(UnloginException ex){
 				applicationLog.record("未登录错误");
-			}catch(PauseException pe){
+			}catch(RetryException pe){
 				applicationLog.record("重新开始循环：" + pe.getReason());
-			}catch(NextException ne){
+			}catch(PauseException ne){
 				if(Single.status() == plan.getId()){
 					Single.setStatus(0);					
 				}
