@@ -69,10 +69,10 @@ public class Single {
 			}
 			serverLog("生成服务器指令：" + status);
 			
-			for(int i = 0; i < 10; i++){
+			for(int i = 0; i < 3; i++){
 				reAssignStatus(plans, size);
 				try {
-					Thread.sleep(3000);
+					Thread.sleep(5000);
 				} catch (InterruptedException e) {
 				}				
 			}
