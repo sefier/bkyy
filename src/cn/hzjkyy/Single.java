@@ -52,10 +52,7 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		//将1/4的号放到十点
-		int hour = serverId % 4 == 0 ? 10 : 9;
-		serverLog("等候至" + hour);
-		waitUntil(getTimestamp(hour, 0) + (serverId % 200) * 1000);
+		waitUntil(getTimestamp(9, 2) + (serverId % 180) * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);
@@ -80,7 +77,7 @@ public class Single {
 	
 	public static void reAssignStatus(ArrayList<Plan> plans, int size){
 		if(status != 1 && status != 3){
-			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 8 * 60 * 1000)){
+			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 10 * 60 * 1000)){
 				lastIndex = (lastIndex + 1) % size;
 				statusAssignAt = System.currentTimeMillis();
 				status = plans.get(lastIndex).getId();
