@@ -9,12 +9,21 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 import cn.hzjkyy.tool.Oss;
 
 public class Upload {
 	public static void main(String[] args){
+		Set<Integer> overPlanIds = new HashSet<Integer>();
+		overPlanIds.add(1000);
+		overPlanIds.add(2000);
+		System.out.println(overPlanIds.contains(1000));
+		System.out.println(overPlanIds.contains(2000));
+		System.out.println(overPlanIds.contains(3000));
+		System.exit(1);
 		String name = UUID.randomUUID().toString().replaceAll("-", "");
 		
 		Enumeration<NetworkInterface> networkInterfaces;

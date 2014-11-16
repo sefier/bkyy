@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 
 import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.model.Plan;
@@ -65,23 +67,25 @@ public class Single {
 			}else if(signal == 2 && status == 1){
 				status = 0;
 			}
-			
-			reAssignStatus(plans, size);
 			serverLog("生成服务器指令：" + status);
-			try {
-				Thread.sleep(30000);
-			} catch (InterruptedException e) {
+			
+			for(int i = 0; i < 10; i++){
+				reAssignStatus(plans, size);
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+				}				
 			}
 		}while(true);
 	}
 	
 	public static void reAssignStatus(ArrayList<Plan> plans, int size){
 		if(status != 1 && status != 3){
-			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 10 * 60 * 1000)){
+			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 10 * 60 * 1000) ||  overPlanIds.contains(status)){
 				lastIndex = (lastIndex + 1) % size;
 				statusAssignAt = System.currentTimeMillis();
 				status = plans.get(lastIndex).getId();
-			}			
+			}
 		}
 	}
 	
@@ -92,12 +96,17 @@ public class Single {
 	private static int status = 0;
 	private static int lastIndex = -1;
 	private static long statusAssignAt;
+	private static Set<Integer> overPlanIds = new HashSet<Integer>();
 	public static synchronized int status(){
 		return status;
 	}
 	
 	public static synchronized void setStatus(int serverStatus){
 		 status = serverStatus;
+	}
+	
+	public static synchronized void finishPlan(int planId){
+		overPlanIds.add(planId);
 	}
 
 	public static void quit(){
