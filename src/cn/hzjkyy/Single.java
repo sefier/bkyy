@@ -12,10 +12,10 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static String programVersion = "1116";
+	public static String programVersion = "1117";
 	public static void main(String[] args){
 		//程序运行环境
-		boolean isTest = false;
+		boolean isTest = true;
 		serverLog("程序启动，版本号：" + programVersion + (isTest ? "测试版" : "正式版"));
 
 		PlanClient planClient = new PlanClient(isTest);
@@ -34,7 +34,7 @@ public class Single {
 		serverLog("服务器报到结束，编号：" + serverId);
 		
 		//向服务器获取预约计划
-		waitUntil(getTimestamp(8, 30) + (serverId % 100) * 1200);
+//		waitUntil(getTimestamp(8, 30) + (serverId % 100) * 1200);
 		serverLog("向服务器获取预约计划");
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
@@ -54,7 +54,7 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(9, 2) + (serverId % 180) * 1000);
+//		waitUntil(getTimestamp(9, 2) + (serverId % 180) * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);

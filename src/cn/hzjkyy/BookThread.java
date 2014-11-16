@@ -27,7 +27,7 @@ public class BookThread extends Thread {
 	
 	public void run() {
 		//创建日志
-		Log.init(isTest ? 1 : 5000);
+		Log.init(isTest ? 2 : 5000);
 		Log applicationLog = Log.getLog(plan, "application");
 		
 		//初始化
