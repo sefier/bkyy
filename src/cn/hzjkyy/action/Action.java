@@ -20,6 +20,7 @@ import cn.hzjkyy.generator.JlcGenerator;
 import cn.hzjkyy.generator.LoginGenerator;
 import cn.hzjkyy.generator.LoginVerifyGenerator;
 import cn.hzjkyy.generator.ModifyGenerator;
+import cn.hzjkyy.generator.SendGenerator;
 import cn.hzjkyy.model.Device;
 import cn.hzjkyy.model.Exam;
 import cn.hzjkyy.model.Plan;
@@ -32,6 +33,7 @@ import cn.hzjkyy.parser.JlcParser;
 import cn.hzjkyy.parser.LoginParser;
 import cn.hzjkyy.parser.LoginVerifyParser;
 import cn.hzjkyy.parser.ModifyParser;
+import cn.hzjkyy.parser.SendParser;
 import cn.hzjkyy.tool.Log;
 
 public class Action {
@@ -79,6 +81,23 @@ public class Action {
 		this.isTest = isTest;
 		actionLog = Log.getLog(plan, "action");
 	}
+	
+	public void sendYzm() throws UnloginException, RetryException, StopException, PauseException {
+		actionLog.record("发送验证码");
+		SendGenerator sendGenerator = new SendGenerator(user);
+		Request sendRequest = sendGenerator.generate();
+		SendParser sendParser = new SendParser();
+		
+		do {
+			actionLog.record("发送验证码");
+			Response response = tab.visit(sendRequest);
+			
+			if(response.getStatusPanel().isSuccess()){
+				sendParser.parse(response.getResponseBody());
+			}
+		}while(!sendParser.getStatusPanel().isSuccess());		
+	}
+	
 	
 	public void changePass(String newPass) throws UnloginException, RetryException, StopException, PauseException{
 		actionLog.record("更改密码：" + user.getPass() + "=>" + newPass);

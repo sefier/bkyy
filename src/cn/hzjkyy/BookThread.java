@@ -57,11 +57,20 @@ public class BookThread extends Thread {
 				explorer.setCheckingMode(false);
 				action.login();
 				action.changePass(newPass);
+				action.login();
 			} catch (UnloginException | RetryException | StopException | PauseException e) {
 			}		
 		}
 		
 		explorer.setCheckingMode(true);
+		
+		//等待8点58分发送验证码
+		action.waitUntil(8, 58);
+		try{
+			action.sendYzm();			
+		} catch (UnloginException | RetryException | StopException | PauseException e) {
+		}
+		
 		String ksrq = "";
 		do {
 			try{
