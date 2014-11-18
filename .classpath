@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="/Users/sefier/Downloads/httpcomponents-client-4.3.5/lib/commons-codec-1.6.jar"/>
 	<classpathentry kind="lib" path="/Users/sefier/Downloads/spymemcached-2.8.4(Java)(大于2.8.1).jar"/>
 	<classpathentry kind="lib" path="/Users/sefier/Downloads/aliyun_java_sdk_20140626/aliyun-openservices-1.2.3.jar"/>
+	<classpathentry kind="lib" path="/httpjava/lib/commons-httpclient.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

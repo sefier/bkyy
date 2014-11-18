@@ -35,6 +35,7 @@ import cn.hzjkyy.parser.LoginVerifyParser;
 import cn.hzjkyy.parser.ModifyParser;
 import cn.hzjkyy.parser.TpyzmParser;
 import cn.hzjkyy.tool.Log;
+import cn.hzjkyy.tool.YzmDecoder;
 
 public class Action {
 	private Tab tab;
@@ -42,7 +43,8 @@ public class Action {
 	private Device device;
 	private Plan plan;
 	private boolean isTest;
-	protected Log actionLog; 
+	protected Log actionLog;
+	private YzmDecoder yzmDecoder;
 	public void close() {
 		actionLog.close();
 	}
@@ -79,6 +81,7 @@ public class Action {
 		this.device = device;
 		this.plan = plan;
 		this.isTest = isTest;
+		this.yzmDecoder = new YzmDecoder();
 		actionLog = Log.getLog(plan, "action");
 	}
 	
@@ -191,7 +194,7 @@ public class Action {
 		actionLog.record("系统开始获取图片验证码");
 		TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
 		Request tpyzmRequest = tpyzmGenerator.generate();
-		TpyzmParser tpyzmParser = new TpyzmParser();
+		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
 		
 		do {
 			actionLog.record("获取图片验证码...");
