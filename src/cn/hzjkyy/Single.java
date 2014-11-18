@@ -75,7 +75,7 @@ public class Single {
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
-				}				
+				}
 			}
 		}while(true);
 	}
