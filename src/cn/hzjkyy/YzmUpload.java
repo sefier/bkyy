@@ -17,7 +17,7 @@ import cn.hzjkyy.agent.PlanClient;
 public class YzmUpload {
 
 	public static void main(String[] args) {	
-		PlanClient planClient = new PlanClient(true);
+		PlanClient planClient = new PlanClient(false);
 		Pattern p = Pattern.compile("\\d{6}");
 
 		do {
