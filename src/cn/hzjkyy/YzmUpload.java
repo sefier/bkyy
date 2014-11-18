@@ -17,7 +17,7 @@ import cn.hzjkyy.agent.PlanClient;
 public class YzmUpload {
 
 	public static void main(String[] args) {	
-		PlanClient planClient = new PlanClient(false);
+		PlanClient planClient = new PlanClient(true);
 		Pattern p = Pattern.compile("\\d{6}");
 
 		do {
@@ -36,17 +36,19 @@ public class YzmUpload {
 						while ((line = br.readLine()) != null) {
 							System.out.println("读取中");
 							String[] dxLine = line.split(cvsSplitBy);
-							String sjhm = dxLine[5].substring(1);
-							String message = dxLine[8];
-							String code = "";
-							
-							Matcher m = p.matcher(message);
-							if (m.find()) {
-								code = m.group();
-								if(code.length() == 6){
-									String yzmLine = sjhm + "," + code;
-									yzms.add(yzmLine);								
-								}
+							if(dxLine.length >= 7){
+								String sjhm = dxLine[5].substring(1);
+								String message = dxLine[8];
+								String code = "";
+								
+								Matcher m = p.matcher(message);
+								if (m.find()) {
+									code = m.group();
+									if(code.length() == 6){
+										String yzmLine = sjhm + "," + code;
+										yzms.add(yzmLine);								
+									}
+								}								
 							}
 						}
 						
