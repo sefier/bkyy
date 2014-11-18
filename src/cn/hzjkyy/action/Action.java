@@ -231,6 +231,7 @@ public class Action {
 			sendYzm();
 		}
 		
+		//持续5分钟，获取短信验证码，如果5分钟内没有获取到，就会停止预约
 		for(int i = 0; i < 10; i++){
 			String dxYzm = planClient.yzmQuery(plan);
 			if(dxYzm != null && dxYzm.length() == 6){
@@ -262,9 +263,11 @@ public class Action {
 					Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
 					Matcher m = ksrqPattern.matcher(response.getResponseBody());
 					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
-				}else if(response.getResponseBody().contains("图片验证码不正确")){
+				}else if(response.getResponseBody().contains("图片验证码有误")){
+					user.setTpyzm(null);
 					throw new RetryException("图片验证码识别错误");
-				}else if(response.getResponseBody().contains("短信验证码不正确")){
+				}else if(response.getResponseBody().contains("短信验证码有误")){
+					user.setDxyzm(null);
 					throw new StopException("短信验证码错误");
 				}
 				jlcParser.parse(response.getResponseBody());
