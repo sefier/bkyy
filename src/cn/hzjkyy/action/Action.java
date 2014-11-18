@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.hzjkyy.agent.PauseException;
+import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.agent.RetryException;
 import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.SuccessException;
@@ -190,9 +191,11 @@ public class Action {
 				sendParser.parse(response.getResponseBody());
 			}
 		}while(!sendParser.getStatusPanel().isSuccess());
+		
+		
 	}
 	
-	public Exam detect() throws UnloginException, RetryException, StopException, PauseException, SuccessException {
+	public Exam detect(PlanClient planClient) throws UnloginException, RetryException, StopException, PauseException, SuccessException {
 //		actionLog.record("进行同意操作");
 //		
 //		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
@@ -218,10 +221,32 @@ public class Action {
 			actionLog.record("获取图片验证码...");
 			Response response = tab.visit(tpyzmRequest);
 			if(response.getStatusPanel().isSuccess()){
+				user.setTpyzm(null);
 				tpyzmParser.parse(response.getResponseBody());
 			}
 		}while(!tpyzmParser.getStatusPanel().isSuccess());
 		user.setTpyzm(tpyzmParser.getTpyzm());
+		
+		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
+			sendYzm();
+		}
+		
+		for(int i = 0; i < 10; i++){
+			String dxYzm = planClient.yzmQuery(plan);
+			if(dxYzm != null && dxYzm.length() == 6){
+				user.setDxyzm(dxYzm);
+				break;
+			}else{
+				try {
+					Thread.sleep(30000);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
+		
+		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
+			throw new StopException("迟迟等不到短信验证码");
+		}
 		
 		//获取考试流水
 		actionLog.record("系统开始获取考试流水。");
@@ -237,6 +262,10 @@ public class Action {
 					Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
 					Matcher m = ksrqPattern.matcher(response.getResponseBody());
 					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+				}else if(response.getResponseBody().contains("图片验证码不正确")){
+					throw new RetryException("图片验证码识别错误");
+				}else if(response.getResponseBody().contains("短信验证码不正确")){
+					throw new StopException("短信验证码错误");
 				}
 				jlcParser.parse(response.getResponseBody());
 			}

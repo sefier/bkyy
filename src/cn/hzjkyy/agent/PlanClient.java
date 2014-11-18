@@ -33,6 +33,32 @@ public class PlanClient {
 		return isTest ? testHost : host;
 	}
 	
+	public String yzmQuery(Plan plan) {
+		String yzm = "";
+		String serverUrl = "http://" + getHost() + "/plans/" + plan.getId() + "/yzm_query";
+		HttpGet httpGet = new HttpGet(serverUrl);
+		CloseableHttpResponse httpResponse = null;
+				
+		try {			
+	        httpResponse = httpclient.execute(httpGet);
+	        int status = httpResponse.getStatusLine().getStatusCode();
+	        if (status >= 200 && status < 300){
+	        	yzm = EntityUtils.toString(httpResponse.getEntity());
+	        	
+	        }
+		} catch (ParseException | IOException e) {
+		} finally {
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (IOException e) {
+				}				
+			}
+		}
+		
+		return yzm;
+	}
+	
 	public String hello() {
 		String serverUrl = "http://" + getHost() + "/plans/hello";
 		HttpPost httpPost = new HttpPost(serverUrl);
