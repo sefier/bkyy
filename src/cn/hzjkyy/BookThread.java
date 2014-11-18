@@ -54,7 +54,7 @@ public class BookThread extends Thread {
 		
 		if(newPass != null){
 			try {
-				explorer.setCheckingMode(false);
+//				explorer.setCheckingMode(false);
 				action.login();
 				action.changePass(newPass);
 				action.login();
@@ -62,7 +62,7 @@ public class BookThread extends Thread {
 			}		
 		}
 		
-		explorer.setCheckingMode(true);
+//		explorer.setCheckingMode(true);
 		
 		//等待8点58分发送验证码
 		action.waitUntil(8, 58);

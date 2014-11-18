@@ -99,10 +99,10 @@ public class Explorer {
 		return nvps;
 	}
 	
-	private boolean checkingMode = true;
-	public void setCheckingMode(boolean checkingMode){
-		this.checkingMode = checkingMode;
-	}
+//	private boolean checkingMode = true;
+//	public void setCheckingMode(boolean checkingMode){
+//		this.checkingMode = checkingMode;
+//	}
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
 	void sendRequest(Tab tab) throws UnloginException, RetryException, StopException, PauseException {
 		Request request = tab.getRequest();
@@ -118,13 +118,13 @@ public class Explorer {
 		long tryStartAt = System.currentTimeMillis();
 		do{
 	    	//检查服务器指令
-	    	int serverStatus = Single.status();
-	    	
-	    	if(serverStatus == 3){
-	    		throw new StopException("服务器指示：3");
-	    	}else if(checkingMode && serverStatus != 1 && serverStatus != plan.getId()){
-	    		throw new RetryException("服务器指示：" + serverStatus);
-	    	}				
+//	    	int serverStatus = Single.status();
+//	    	
+//	    	if(serverStatus == 3){
+//	    		throw new StopException("服务器指示：3");
+//	    	}else if(checkingMode && serverStatus != 1 && serverStatus != plan.getId()){
+//	    		throw new RetryException("服务器指示：" + serverStatus);
+//	    	}				
 
 			tries++;
 			request.setSentAt(System.currentTimeMillis());

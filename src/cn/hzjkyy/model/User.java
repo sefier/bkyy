@@ -8,6 +8,8 @@ public class User {
 	private String sfzmmc;
 	private String kskm;
 	private String jlc;
+	public String dxyzm;
+	public String tpyzm;
 	
 	public String getJlc() {
 		return jlc;

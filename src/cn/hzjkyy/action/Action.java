@@ -218,6 +218,8 @@ public class Action {
 					Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
 					Matcher m = ksrqPattern.matcher(response.getResponseBody());
 					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+				}else if(response.getResponseBody().contains("没有找到你的考试业务流水信息")){
+					throw new RetryException("业务流水查询失败");
 				}
 				jlcParser.parse(response.getResponseBody());
 			}
