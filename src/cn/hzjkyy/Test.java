@@ -20,10 +20,25 @@ public class Test {
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		
 		Plan p = new Plan();
-		p.setSfzmhm("");
-		p.setPass("");
+		p.setSfzmhm("330123197106195327");
+		p.setPass("553280");
 		plans.add(p);
 		
+		Plan p1 = new Plan();
+		p1.setSfzmhm("35072319931104171X");
+		p1.setPass("814360");
+		plans.add(p1);
+		
+		Plan p2 = new Plan();
+		p2.setSfzmhm("330122197608292526");
+		p2.setPass("600372");
+		plans.add(p2);
+
+		Plan p3 = new Plan();
+		p3.setSfzmhm("362323197409292122");
+		p3.setPass("497841");
+		plans.add(p3);
+
 		for(Plan plan : plans){
 			
 			//创建日志
