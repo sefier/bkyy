@@ -32,6 +32,34 @@ public class PlanClient {
 	private String getHost(){
 		return isTest ? testHost : host;
 	}
+	public boolean uploadYzm(String yzm){
+		boolean result = false;
+		String serverUrl = "http://" + getHost() + "/plans/yzm_upload";
+		HttpPost httpPost = new HttpPost(serverUrl);
+		CloseableHttpResponse httpResponse = null;
+				
+		try {
+			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
+			nvps.add(new BasicNameValuePair("yzm", yzm));
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+	        httpResponse = httpclient.execute(httpPost);
+	        
+	        int status = httpResponse.getStatusLine().getStatusCode();
+	        if (status >= 200 && status < 300){
+	        	result = true;       	
+	        }
+		} catch (ParseException | IOException e) {
+		} finally {
+			if (httpResponse != null) {
+				try {
+					httpResponse.close();
+				} catch (IOException e) {
+				}				
+			}
+		}
+		
+		return result;
+	}
 	
 	public String hello() {
 		String serverUrl = "http://" + getHost() + "/plans/hello";
