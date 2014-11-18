@@ -268,7 +268,7 @@ public class Action {
 					throw new RetryException("图片验证码识别错误");
 				}else if(response.getResponseBody().contains("短信验证码有误")){
 					user.setDxyzm(null);
-					throw new StopException("短信验证码错误");
+					throw new RetryException("短信验证码错误");
 				}
 				jlcParser.parse(response.getResponseBody());
 			}

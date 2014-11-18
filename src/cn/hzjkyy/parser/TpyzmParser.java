@@ -20,7 +20,7 @@ public class TpyzmParser extends Parser {
 		super.clear();
 	}
 	
-	private Pattern tpyzmPattern = Pattern.compile("<yzm>(.+)</yzm>");
+	private Pattern tpyzmPattern = Pattern.compile("<yzm>([\\s\\S]*)</yzm>");
 	public void parse(String response) {
 		clear();
 		String tpyzmPic = null;
@@ -32,7 +32,7 @@ public class TpyzmParser extends Parser {
 			}
 		}
 		
-		if(tpyzm.length() == 4){			
+		if(tpyzm.length() == 4){
 			getStatusPanel().success();
 		}else{
 			getStatusPanel().error();
