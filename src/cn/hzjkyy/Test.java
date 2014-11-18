@@ -16,10 +16,20 @@ import cn.hzjkyy.tool.Log;
 
 public class Test {
 	public static void main(String[] args){
+		if(args.length < 5){
+			System.exit(1);
+		}
+		String sfzmhm = args[0];
+		String pass = args[1];
+		String ksdd = args[2];
+		String tpyzm = args[3];
+		String dxyzm = args[4];
+		
 		boolean isTest = true;
 		Plan plan = new Plan();
-		plan.setSfzmhm("340811197811035817");
-		plan.setPass("123456");
+		plan.setSfzmhm(sfzmhm);
+		plan.setPass(pass);
+		plan.setKsdd(ksdd);
 		
 		//创建日志
 		Log.init(isTest ? 1 : 5000);
@@ -37,16 +47,8 @@ public class Test {
 
 //		explorer.setCheckingMode(true);
 
-		try{
-			action.login();
-//			action.sendYzm();
-		} catch (RetryException | StopException | PauseException e) {
-//		} catch (UnloginException ue){
-//			
-		}
-//		System.exit(1);
-		user.tpyzm = "6645";
-		user.dxyzm = "734828";
+		user.tpyzm = tpyzm;
+		user.dxyzm = dxyzm;
 		
 		do {
 			try{
