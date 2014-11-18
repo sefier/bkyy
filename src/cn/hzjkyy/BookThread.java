@@ -83,8 +83,8 @@ public class BookThread extends Thread {
 			    	}
 				}while(true);
 
+				action.login();
 				do {
-					action.login();
 					//获取考试信息
 					if(exam == null || exam.ksdd != "3301007"){
 						exam = action.detect();						

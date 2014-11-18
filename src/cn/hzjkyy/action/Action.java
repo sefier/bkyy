@@ -20,6 +20,7 @@ import cn.hzjkyy.generator.JlcGenerator;
 import cn.hzjkyy.generator.LoginGenerator;
 import cn.hzjkyy.generator.LoginVerifyGenerator;
 import cn.hzjkyy.generator.ModifyGenerator;
+import cn.hzjkyy.generator.TpyzmGenerator;
 import cn.hzjkyy.model.Device;
 import cn.hzjkyy.model.Exam;
 import cn.hzjkyy.model.Plan;
@@ -32,6 +33,7 @@ import cn.hzjkyy.parser.JlcParser;
 import cn.hzjkyy.parser.LoginParser;
 import cn.hzjkyy.parser.LoginVerifyParser;
 import cn.hzjkyy.parser.ModifyParser;
+import cn.hzjkyy.parser.TpyzmParser;
 import cn.hzjkyy.tool.Log;
 
 public class Action {
@@ -185,6 +187,21 @@ public class Action {
 //		}while(!agreeParser.getStatusPanel().isSuccess());
 //		actionLog.record("同意操作成功");
 
+		//获取图片验证码
+		actionLog.record("系统开始获取图片验证码");
+		TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
+		Request tpyzmRequest = tpyzmGenerator.generate();
+		TpyzmParser tpyzmParser = new TpyzmParser();
+		
+		do {
+			actionLog.record("获取图片验证码...");
+			Response response = tab.visit(tpyzmRequest);
+			if(response.getStatusPanel().isSuccess()){
+				tpyzmParser.parse(response.getResponseBody());
+			}
+		}while(!tpyzmParser.getStatusPanel().isSuccess());
+		user.setTpyzm(tpyzmParser.getTpyzm());
+		
 		//获取考试流水
 		actionLog.record("系统开始获取考试流水。");
 		JlcGenerator jlcGenerator = new JlcGenerator(user);

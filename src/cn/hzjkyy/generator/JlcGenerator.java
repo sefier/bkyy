@@ -22,7 +22,7 @@ public class JlcGenerator extends Generator {
 	
 	@Override
 	public String getJkid() {
-		return "A001706";
+		return "A001740";
 	}
 
 	@Override
@@ -31,7 +31,11 @@ public class JlcGenerator extends Generator {
 			.append(user.getSfzmmc())
 			.append("</sfzmmc><sfzmhm>")
 			.append(user.getSfzmhm())
-			.append("</sfzmhm><token>")
+			.append("</sfzmhm><dxyzm>")
+			.append(user.getDxyzm())
+			.append("</dxyzm><tpyzm>")
+			.append(user.getTpyzm())
+			.append("</tpyzm><token>")
 			.append(user.getToken())
 			.append("</token></QueryCondition></root>")
 			.toString();

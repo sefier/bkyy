@@ -8,7 +8,25 @@ public class User {
 	private String sfzmmc;
 	private String kskm;
 	private String jlc;
+	private String tpyzm;
+	private String dxyzm;
 	
+	public String getDxyzm() {
+		return dxyzm;
+	}
+
+	public void setDxyzm(String dxyzm) {
+		this.dxyzm = dxyzm;
+	}
+
+	public String getTpyzm() {
+		return tpyzm;
+	}
+
+	public void setTpyzm(String tpyzm) {
+		this.tpyzm = tpyzm;
+	}
+
 	public String getJlc() {
 		return jlc;
 	}
