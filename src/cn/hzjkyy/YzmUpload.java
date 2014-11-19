@@ -38,6 +38,9 @@ public class YzmUpload {
 							String[] dxLine = line.split(cvsSplitBy);
 							if(dxLine.length >= 7){
 								String sjhm = dxLine[5].substring(1);
+								if(sjhm.startsWith("+86")){
+									sjhm = sjhm.substring(3);
+								}
 								String message = dxLine[8];
 								String code = "";
 								
