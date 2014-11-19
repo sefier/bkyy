@@ -191,10 +191,10 @@ public class Action {
 				sendParser.parse(response.getResponseBody());
 			}
 		}while(!sendParser.getStatusPanel().isSuccess());
-		
+		lastSendAt = System.currentTimeMillis();
 		
 	}
-	
+	private long lastSendAt = 0;
 	public Exam detect(PlanClient planClient) throws UnloginException, RetryException, StopException, PauseException, SuccessException {
 //		actionLog.record("进行同意操作");
 //		
@@ -227,26 +227,28 @@ public class Action {
 		}while(!tpyzmParser.getStatusPanel().isSuccess());
 		user.setTpyzm(tpyzmParser.getTpyzm());
 		
-		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
+		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 20 * 60 * 1000 > lastSendAt){
 			sendYzm();
 		}
 		
-		//持续5分钟，获取短信验证码，如果5分钟内没有获取到，就会停止预约
-		for(int i = 0; i < 10; i++){
-			String dxYzm = planClient.yzmQuery(plan);
-			if(dxYzm != null && dxYzm.length() == 6){
-				user.setDxyzm(dxYzm);
-				break;
-			}else{
-				try {
-					Thread.sleep(30000);
-				} catch (InterruptedException e) {
+		//持续5分钟，获取短信验证码，如果10分钟内没有获取到，就会休息预约
+		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
+			for(int i = 0; i < 30; i++){
+				String dxYzm = planClient.yzmQuery(plan);
+				if(dxYzm != null && dxYzm.length() == 6){
+					user.setDxyzm(dxYzm);
+					break;
+				}else{
+					try {
+						Thread.sleep(20000);
+					} catch (InterruptedException e) {
+					}
 				}
-			}
+			}			
 		}
 		
 		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
-			throw new StopException("迟迟等不到短信验证码");
+			throw new PauseException("迟迟等不到短信验证码");
 		}
 		
 		//获取考试流水
@@ -268,6 +270,7 @@ public class Action {
 					throw new RetryException("图片验证码识别错误");
 				}else if(response.getResponseBody().contains("短信验证码有误")){
 					user.setDxyzm(null);
+					lastSendAt = 0;
 					throw new RetryException("短信验证码错误");
 				}
 				jlcParser.parse(response.getResponseBody());
