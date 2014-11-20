@@ -40,14 +40,13 @@ public class YzmDecoder {
 		for(int i = 0; i < 30; i++){
 			r = uuApi.getResult(l);
 			System.out.println("识别结果：" + r);
-			if(r.length() == 4){
-				break;
-			}else{
+			if(r.equals("-3")){
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
 				}				
+			}else{
+				break;
 			}
 		}
 		
