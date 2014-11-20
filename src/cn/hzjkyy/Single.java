@@ -54,7 +54,7 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(8, 57) + (serverId % 240) * 1000);
+		waitUntil(getTimestamp(8, 55) + (serverId % 120) * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);
@@ -82,7 +82,7 @@ public class Single {
 	
 	public static void reAssignStatus(ArrayList<Plan> plans, int size){
 		if(status != 1 && status != 3){
-			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 10 * 60 * 1000) ||  overPlanIds.contains(status)){
+			if(status == 0 || (System.currentTimeMillis() - statusAssignAt > 20 * 60 * 1000) ||  overPlanIds.contains(status)){
 				lastIndex = (lastIndex + 1) % size;
 				statusAssignAt = System.currentTimeMillis();
 				status = plans.get(lastIndex).getId();

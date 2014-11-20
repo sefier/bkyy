@@ -231,9 +231,9 @@ public class Action {
 			sendYzm();
 		}
 		
-		//持续5分钟，获取短信验证码，如果10分钟内没有获取到，就会休息预约
+		//持续20分钟，获取短信验证码，如果20分钟内没有获取到，就会休息预约
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-			for(int i = 0; i < 30; i++){
+			for(int i = 0; i < 60; i++){
 				String dxYzm = planClient.yzmQuery(plan);
 				if(dxYzm != null && dxYzm.length() == 6){
 					user.setDxyzm(dxYzm);
@@ -248,7 +248,7 @@ public class Action {
 		}
 		
 		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
-			throw new PauseException("迟迟等不到短信验证码");
+			throw new StopException("迟迟等不到短信验证码");
 		}
 		
 		//获取考试流水
