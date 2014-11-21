@@ -283,6 +283,10 @@ public class Action {
 		user.setKskm(kskm);
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
+		try {
+			Thread.sleep(27000);
+		} catch (InterruptedException e) {
+		}
 		
 		//获取考试信息
 		actionLog.record("系统开始获取考试信息：");

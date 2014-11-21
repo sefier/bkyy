@@ -87,7 +87,13 @@ public class BookThread extends Thread {
 				do {
 					//获取考试信息
 					if(exam == null || exam.ksdd != "3301007"){
-						exam = action.detect(planClient);						
+						exam = action.detect(planClient);
+						if(exam != null){
+							try {
+								Thread.sleep(17000);
+							} catch (InterruptedException e) {
+							}
+						}
 					}
 						
 					//预约
