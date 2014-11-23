@@ -18,8 +18,8 @@ public class ExamParser extends Parser{
 	public ExamParser(Plan plan){
 		this.plan = plan;
 		String ksrq = "2014-12-.+?"; //plan.getStartKsrq() == null ? "2014-11.+?" : plan.getStartKsrq();
-		patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
-		patterns[1] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+		//patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+		patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
 	}
 	
 	public void clear() {
