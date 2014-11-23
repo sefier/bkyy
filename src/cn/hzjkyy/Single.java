@@ -12,7 +12,7 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static String programVersion = "1122";
+	public static String programVersion = "1124";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
@@ -54,7 +54,7 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(8, 55) + (serverId % 120) * 1000);
+		waitUntil(getTimestamp(8, 45) + (serverId % 600) * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);
