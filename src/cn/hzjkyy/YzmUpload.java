@@ -2,9 +2,10 @@ package cn.hzjkyy;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -24,14 +25,17 @@ public class YzmUpload {
 			//读取文件
 			File folder = new File(Paths.get("").toAbsolutePath().toString());
 			for(File file : folder.listFiles()){
-				if(file.getName().endsWith(".csv")){
+				if(file.getName().startsWith("360") && file.getName().endsWith(".csv")){
 					System.out.println("识别文件" + file.getAbsolutePath());
 					BufferedReader br = null;
 					String line = "";
 					String cvsSplitBy = ",";
 				 
 					try {
-						br = new BufferedReader(new FileReader(file));
+						br = new BufferedReader(
+								   new InputStreamReader(
+						                      new FileInputStream(file), "UTF8"));
+						//br = new BufferedReader(new FileReader(file));
 						Set<String> yzms = new HashSet<String>();
 						while ((line = br.readLine()) != null) {
 							System.out.println("读取中");
@@ -67,7 +71,6 @@ public class YzmUpload {
 					    String yzm = sb.toString();
 					    planClient.uploadYzm(yzm);
 					    System.out.println("验证码上传" + yzm);
-						file.delete();	 
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					} catch (IOException e) {
@@ -80,6 +83,10 @@ public class YzmUpload {
 								e.printStackTrace();
 							}
 						}
+					}
+					file.setWritable(true);
+					if(!file.delete()){
+						System.out.println("未删除成功!");
 					}
 				}
 			}
