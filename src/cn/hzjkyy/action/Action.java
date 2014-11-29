@@ -284,7 +284,7 @@ public class Action {
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
 		try {
-			Thread.sleep(27000);
+			Thread.sleep(35000);
 		} catch (InterruptedException e) {
 		}
 		
