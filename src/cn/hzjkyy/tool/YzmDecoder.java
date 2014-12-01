@@ -34,7 +34,7 @@ public class YzmDecoder {
 		} catch (IOException e) {
 		}
 
-		String l = uuApi.upload(filePath, "8001", false);
+		String l = uuApi.upload(filePath, "8002", false);
 		
 		String r = null;
 		for(int i = 0; i < 30; i++){
