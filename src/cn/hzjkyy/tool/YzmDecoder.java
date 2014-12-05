@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
@@ -14,6 +16,16 @@ public class YzmDecoder {
 		uuApi = new UuApi();
 		uuApi.setSoftInfo("101749", "c5964b2abbc6427f886d2deda1973a2a");
 		uuApi.userLogin("sefier", "AnLu@203");
+	}
+	
+	private static Map<String, String> decodeResult = new HashMap<String, String>();
+	
+	public String fetch(String l){
+		return decodeResult.get(l);
+	}
+	
+	public void reportError(String l){
+		uuApi.reportError(l);
 	}
 	
 	public String decode(String yzmPic){
@@ -50,6 +62,8 @@ public class YzmDecoder {
 			}
 		}
 		
-		return r;
+		decodeResult.put(l, r);
+		
+		return l;
 	}
 }

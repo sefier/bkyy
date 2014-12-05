@@ -267,6 +267,7 @@ public class Action {
 					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
 				}else if(response.getResponseBody().contains("图片验证码有误")){
 					user.setTpyzm(null);
+					tpyzmParser.reportError();
 					throw new RetryException("图片验证码识别错误");
 				}else if(response.getResponseBody().contains("短信验证码有误")){
 					user.setDxyzm(null);

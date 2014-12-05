@@ -7,6 +7,7 @@ import cn.hzjkyy.tool.YzmDecoder;
 
 public class TpyzmParser extends Parser {
 	private String tpyzm;
+	private String codeId;
 	private YzmDecoder yzmDecoder;
 	public TpyzmParser(YzmDecoder yzmDecoder) {
 		this.yzmDecoder = yzmDecoder;
@@ -14,6 +15,12 @@ public class TpyzmParser extends Parser {
 		
 	public String getTpyzm() {
 		return tpyzm;
+	}
+	
+	public void reportError() {
+		if(codeId != null){
+			yzmDecoder.reportError(codeId);
+		}
 	}
 
 	public void clear() {
@@ -28,13 +35,15 @@ public class TpyzmParser extends Parser {
 		if (m.find()) {
 			tpyzmPic = m.group(1);
 			if(tpyzmPic.length() > 10){
-				tpyzm = yzmDecoder.decode(tpyzmPic);
+				codeId = yzmDecoder.decode(tpyzmPic);
+				tpyzm = yzmDecoder.fetch(codeId);
 			}
 		}
 		
-		if(tpyzm.length() == 4){
+		if(tpyzm != null && tpyzm.length() == 4){
 			getStatusPanel().success();
 		}else{
+			reportError();
 			getStatusPanel().error();
 		}		
 	}
