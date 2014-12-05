@@ -319,6 +319,10 @@ public class Action {
 			Matcher m = ksrqPattern.matcher(response.getResponseBody());
 			throw new SuccessException(m.find() ? m.group() : "2014-12-06");
 		}
+		
+		if(response.getResponseBody().contains("请在次月再行预约")){
+			throw new StopException("驾校名额已满");
+		}
 
 		if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
 			actionLog.record("预约考试成功！");

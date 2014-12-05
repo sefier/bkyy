@@ -100,7 +100,7 @@ public class BookThread extends Thread {
 					if(exam != null){
 						ksrq = exam.ksrq;
 						applicationLog.record("获取考试成功，预约考试");
-						success = action.book(exam);						
+						success = action.book(exam);		
 					}else{
 						applicationLog.record("获取考试失败");
 					}					
