@@ -7,8 +7,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
-import java.util.HashSet;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,7 +41,8 @@ public class YzmUpload {
 								   new InputStreamReader(
 						                      new FileInputStream(file), "UTF8"));
 						//br = new BufferedReader(new FileReader(file));
-						Set<String> yzms = new HashSet<String>();
+						Map<String, YzmRecord> yzms = new HashMap<String, YzmRecord>();
+						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						while ((line = br.readLine()) != null) {
 							System.out.println("读取中");
 							String[] dxLine = line.split(cvsSplitBy);
@@ -52,21 +58,38 @@ public class YzmUpload {
 								if (m.find()) {
 									code = m.group();
 									if(code.length() == 6){
-										String yzmLine = sjhm + "," + code;
-										yzms.add(yzmLine);								
+										long timestamp = 0;
+										try {
+											timestamp = dateFormat.parse(dxLine[6]).getTime();
+										} catch (ParseException e) {
+										}
+										
+										YzmRecord yzmRecord = new YzmRecord(timestamp, code);
+										
+										YzmRecord oldYzmRecord = yzms.get(sjhm);
+										if(oldYzmRecord == null || oldYzmRecord.timestamp < yzmRecord.timestamp){
+											yzms.put(sjhm, yzmRecord);									
+										}
 									}
 								}								
 							}
 						}
 						
 					    StringBuilder sb = new StringBuilder();
-					    Iterator<String> iter = yzms.iterator();
-					    if (iter.hasNext())
-					        sb.append(iter.next().toString());
-					    while (iter.hasNext()) {
-					        sb.append(";");
-					        sb.append(iter.next().toString());
+					    Set<String> sjhms = yzms.keySet();
+					    Iterator<String> iterator = sjhms.iterator();
+
+					    if(iterator.hasNext()){
+					    	String sjhm = iterator.next();
+					    	YzmRecord yzmRecord = yzms.get(sjhm);
+					    	sb.append(sjhm + "," + yzmRecord.yzm);
 					    }
+						while(iterator.hasNext()) {
+							sb.append(";");
+					    	String sjhm = iterator.next();
+					    	YzmRecord yzmRecord = yzms.get(sjhm);
+					    	sb.append(sjhm + "," + yzmRecord.yzm);
+						}
 					    
 					    String yzm = sb.toString();
 					    planClient.uploadYzm(yzm);
