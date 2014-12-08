@@ -49,7 +49,7 @@ public class YzmDecoder {
 		String l = uuApi.upload(filePath, "8002", false);
 		
 		String r = null;
-		for(int i = 0; i < 30; i++){
+		for(int i = 0; i < 6; i++){
 			r = uuApi.getResult(l);
 			System.out.println("识别结果：" + r);
 			if(r.equals("-3")){
