@@ -24,7 +24,7 @@ public class YzmUpload {
 
 	public static void main(String[] args) {	
 		PlanClient planClient = new PlanClient(false);
-		Pattern p = Pattern.compile("\\d{6}");
+		Pattern p = Pattern.compile("\\D(\\d{6})\\D");
 
 		do {
 			//读取文件
@@ -56,7 +56,7 @@ public class YzmUpload {
 								
 								Matcher m = p.matcher(message);
 								if (m.find()) {
-									code = m.group();
+									code = m.group(1);
 									if(code.length() == 6){
 										long timestamp = 0;
 										try {
