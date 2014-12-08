@@ -179,6 +179,8 @@ public class Explorer {
 //		        		throw new PauseException("考点无名额");
 		        	}else if(responseString.contains("密码错误")){
 		        		throw new StopException("密码错误");
+		        	}else if(responseString.contains("恶意刷名额嫌疑")){
+		        		throw new StopException("恶意刷名额嫌疑");
 		        	}else{
 			        	response.getStatusPanel().success();
 			        	response.setResponseBody(responseString);
