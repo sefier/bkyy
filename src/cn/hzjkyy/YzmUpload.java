@@ -10,7 +10,6 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -29,7 +28,6 @@ public class YzmUpload {
 		do {
 			//读取文件
 			File folder = new File(Paths.get("").toAbsolutePath().toString());
-			System.out.println(folder);
 			for(File file : folder.listFiles()){
 				if(file.getName().startsWith("360") && file.getName().endsWith(".csv")){
 					System.out.println("识别文件" + file.getAbsolutePath());
@@ -41,7 +39,6 @@ public class YzmUpload {
 						br = new BufferedReader(
 								   new InputStreamReader(
 						                      new FileInputStream(file), "UTF8"));
-						//br = new BufferedReader(new FileReader(file));
 						Map<String, YzmRecord> yzms = new HashMap<String, YzmRecord>();
 						DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 						while ((line = br.readLine()) != null) {
@@ -99,7 +96,7 @@ public class YzmUpload {
 						}
 					    
 					    String yzm = sb.toString();
-					    //planClient.uploadYzm(yzm);
+					    planClient.uploadYzm(yzm);
 					    System.out.println("验证码上传" + i + "个：" + yzm);
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
@@ -114,11 +111,10 @@ public class YzmUpload {
 							}
 						}
 					}
-//					file.setWritable(true);
-//					if(!file.delete()){
-//						System.out.println("未删除成功!");
-//					}
-					System.exit(1);
+					file.setWritable(true);
+					if(!file.delete()){
+						System.out.println("未删除成功!");
+					}
 				}
 			}
 			
