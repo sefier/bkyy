@@ -300,7 +300,7 @@ public class UuApi {
 	// 识别结果不正确报错误
 	public String reportError(String codeID) {
 		// if(!is_numeric($codeID)){return '-1009|The codeID is not number';}
-		if (softContentKEY.isEmpty() && userKey.isEmpty()) {
+		if (!softContentKEY.isEmpty() && !userKey.isEmpty()) {
 			String url = getServerUrl("code") + "/Upload/ReportError.aspx?key=" + userKey + "&ID=" + codeID + "&sid=" + softID + "&skey=" + softContentKEY + "&R=" + System.currentTimeMillis();
 			String result = uuGetUrl(url, new HashMap(), false);
 			if (result.equals("OK")) {
