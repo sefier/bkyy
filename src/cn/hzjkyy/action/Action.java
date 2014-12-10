@@ -50,9 +50,16 @@ public class Action {
 	private boolean isTest;
 	protected Log actionLog;
 	private YzmDecoder yzmDecoder;
+	private int offset = 3000;
 	private Set<String> oldYzms = new HashSet<String>();
 	public void close() {
 		actionLog.close();
+	}
+	public void setOffset(int offset){
+		this.offset = offset;
+	}
+	public int getOffset(){
+		return this.offset;
 	}
 	public Action waitUntil(long timestamp){
 		actionLog.record("等待至：" + Log.dateFormat.format(new Date(timestamp)));
@@ -298,7 +305,7 @@ public class Action {
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
 		try {
-			Thread.sleep(wait);
+			Thread.sleep(wait + this.getOffset());
 		} catch (InterruptedException e) {
 		}
 		
