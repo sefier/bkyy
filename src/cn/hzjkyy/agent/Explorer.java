@@ -144,18 +144,12 @@ public class Explorer {
 		        		throw new UnloginException();
 		        	}else if(responseString.contains("后再按确定按钮") || responseString.contains("秒后再按预约按钮")){
 		        		exceptionString = responseString;
-		        		Pattern p1 = Pattern.compile("请\\[(\\d+)\\]秒后再按确定按钮");
-		        		Pattern p2 = Pattern.compile("请\\[(\\d+)\\]秒后再按预约按钮");
+		        		Pattern p1 = Pattern.compile("请\\[(\\d+)\\]秒后再按");
 		        		Matcher m1 = p1.matcher(responseString);
-		        		Matcher m2 = p2.matcher(responseString);
 		        		String value = null;
 		        		if (m1.find()) {
 		        			value = m1.group(1);
-		        		}else if(m2.find()){
-		        			value = m2.group(1);
-		        		}
-		        		
-		        		if(value == null){
+		        		}else{
 		        			value = "32";
 		        		}
 		        		
@@ -169,7 +163,7 @@ public class Explorer {
 							} catch (InterruptedException e) {
 							}		        			
 		        		}
-		        		throw new RetryException("按钮点击过快");
+		        		throw new RetryException("按钮点击过");
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
 		        		throw new StopException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
