@@ -3,6 +3,8 @@ package cn.hzjkyy.action;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +50,7 @@ public class Action {
 	private boolean isTest;
 	protected Log actionLog;
 	private YzmDecoder yzmDecoder;
+	private Set<String> oldYzms = new HashSet<String>();
 	public void close() {
 		actionLog.close();
 	}
@@ -227,15 +230,15 @@ public class Action {
 		}while(!tpyzmParser.getStatusPanel().isSuccess());
 		user.setTpyzm(tpyzmParser.getTpyzm());
 		
-		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 20 * 60 * 1000 > lastSendAt){
+		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 25 * 60 * 1000 > lastSendAt){
 			sendYzm();
 		}
 		
-		//持续20分钟，获取短信验证码，如果20分钟内没有获取到，就会休息预约
+		//持续25分钟，获取短信验证码，如果25分钟内没有获取到，就会休息预约
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-			for(int i = 0; i < 60; i++){
+			for(int i = 0; i < 75; i++){
 				String dxYzm = planClient.yzmQuery(plan);
-				if(dxYzm != null && dxYzm.length() == 6){
+				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
 					user.setDxyzm(dxYzm);
 					break;
 				}else{
@@ -270,6 +273,7 @@ public class Action {
 					tpyzmParser.reportError();
 					throw new RetryException("图片验证码识别错误");
 				}else if(response.getResponseBody().contains("短信验证码有误")){
+					oldYzms.add(user.getDxyzm());
 					user.setDxyzm(null);
 					lastSendAt = 0;
 					throw new RetryException("短信验证码错误");
