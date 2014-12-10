@@ -39,7 +39,7 @@ public class Single {
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 			}
 
