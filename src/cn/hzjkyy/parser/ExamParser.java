@@ -21,13 +21,13 @@ public class ExamParser extends Parser{
 		String ksrq = "2015-\\d+-\\d+";
 		
 		if(plan.getKsdd() != null && plan.getKsdd().length() == 7){
-			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");			
+			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");			
 		}else if(user.getKskm().equals("3")){
 			String preferKsdd = plan.getId() % 2 == 0 ? "3301022" : "3301034";
-			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + preferKsdd + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
-			patterns[1] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(" + preferKsdd + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+			patterns[1] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
 		}else{
-			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
 		}
 	}
 	
@@ -53,8 +53,9 @@ public class ExamParser extends Parser{
 					Matcher m = examPattern.matcher(response);
 					if (m.find()) {
 						String kscc = m.group(1);
-						String ksdd = m.group(2);
-						String ksrq = m.group(3);
+						int sysj = Integer.parseInt(m.group(2));
+						String ksdd = m.group(3);
+						String ksrq = m.group(4);
 						
 						if(kscc.length() > 0 && ksdd.length() > 0 && ksrq.length() > 0){
 							try {
@@ -79,7 +80,7 @@ public class ExamParser extends Parser{
 							}catch(ParseException e){
 							}
 							
-							exam = new Exam(kscc, ksdd, ksrq);
+							exam = new Exam(kscc, ksdd, ksrq, sysj);
 							break;
 						}
 					}

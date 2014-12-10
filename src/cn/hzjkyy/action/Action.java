@@ -260,8 +260,12 @@ public class Action {
 		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
+		long wait = 30000;
+		long startJlc = System.currentTimeMillis();
+		
 		do {
 			actionLog.record("获取考试流水...");
+			startJlc = System.currentTimeMillis();
 			Response response = tab.visit(jlcRequest);
 			if(response.getStatusPanel().isSuccess()){
 				if(response.getResponseBody().contains("不能重复预约")){
@@ -284,7 +288,8 @@ public class Action {
 				}
 				jlcParser.parse(response.getResponseBody());
 			}
-		}while(!jlcParser.getStatusPanel().isSuccess());		
+		}while(!jlcParser.getStatusPanel().isSuccess());
+		wait -= (System.currentTimeMillis() - startJlc);
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
 		
@@ -293,7 +298,7 @@ public class Action {
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
 		try {
-			Thread.sleep(40000);
+			Thread.sleep(wait);
 		} catch (InterruptedException e) {
 		}
 		
