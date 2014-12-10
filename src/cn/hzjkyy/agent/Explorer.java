@@ -169,6 +169,7 @@ public class Explorer {
 							} catch (InterruptedException e) {
 							}		        			
 		        		}
+		        		throw new RetryException("按钮点击过快");
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
 		        		throw new StopException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
