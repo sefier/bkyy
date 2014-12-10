@@ -8,6 +8,9 @@ public class Tab {
 	public Tab(Explorer explorer) {
 		this.explorer = explorer;
 	}
+	public Explorer getExplorer(){
+		return this.explorer;
+	}
 	
 	//将窗口从浏览器中剥离
 	public void close() {

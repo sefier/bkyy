@@ -50,16 +50,12 @@ public class Action {
 	private boolean isTest;
 	protected Log actionLog;
 	private YzmDecoder yzmDecoder;
-	private int offset = 3000;
 	private Set<String> oldYzms = new HashSet<String>();
 	public void close() {
 		actionLog.close();
 	}
-	public void setOffset(int offset){
-		this.offset = offset;
-	}
 	public int getOffset(){
-		return this.offset;
+		return tab.getExplorer().getOffset();
 	}
 	public Action waitUntil(long timestamp){
 		actionLog.record("等待至：" + Log.dateFormat.format(new Date(timestamp)));

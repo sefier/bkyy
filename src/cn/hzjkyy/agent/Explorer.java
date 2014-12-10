@@ -29,6 +29,12 @@ public class Explorer {
 		tabs.clear();
 		explorerLog.close();
 	}
+	private int offset = 3000;
+	
+	public int getOffset(){
+		return this.offset;
+	}
+
 	//浏览器请求信息
 	private String serverUrl = "http://service.zscg.hzcdt.com/api/httpapi";
 	private List<NameValuePair> basicNvps = new ArrayList <NameValuePair>();
@@ -159,11 +165,14 @@ public class Explorer {
 		        				int second = sleep * 1000;
 		        				
 								Thread.sleep(second);
+								if(sleep < 30000){
+									offset += sleep;
+								}
 							} catch (NumberFormatException e) {
 							} catch (InterruptedException e) {
 							}		        			
 		        		}
-		        		throw new RetryException("按钮点击过");
+		        		throw new RetryException("按钮点击过早");
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
 		        		throw new StopException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
