@@ -90,7 +90,7 @@ public class BookThread extends Thread {
 						exam = action.detect(planClient);
 						if(exam != null){
 							try {
-								Thread.sleep(exam.sysj + action.getOffset());
+								Thread.sleep(exam.sysj + explorer.getOffset());
 							} catch (InterruptedException e) {
 							}
 						}
