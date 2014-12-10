@@ -297,7 +297,7 @@ public class Action {
 		actionLog.record("系统开始获取考试信息：");
 		ExamGenerator examGenerator = new ExamGenerator(user);
 		Request examRequest = examGenerator.generate();
-		ExamParser examParser = new ExamParser(plan);
+		ExamParser examParser = new ExamParser(plan, user);
 		
 		do{
 			actionLog.record("获取考试信息...");

@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 
 import cn.hzjkyy.model.Exam;
 import cn.hzjkyy.model.Plan;
+import cn.hzjkyy.model.User;
 
 public class ExamParser extends Parser{
 	private Exam exam;
@@ -15,11 +16,19 @@ public class ExamParser extends Parser{
 	private Pattern[] patterns = new Pattern[2];
 	private Plan plan;
 	
-	public ExamParser(Plan plan){
+	public ExamParser(Plan plan, User user){
 		this.plan = plan;
-		String ksrq = "2014-12-.+?"; //plan.getStartKsrq() == null ? "2014-11.+?" : plan.getStartKsrq();
-		//patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
-		patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+		String ksrq = "2015-\\d+-\\d+";
+		
+		if(plan.getKsdd() != null && plan.getKsdd().length() == 7){
+			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");			
+		}else if(user.getKskm().equals("3")){
+			String preferKsdd = plan.getId() % 2 == 0 ? "3301022" : "3301034";
+			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(" + preferKsdd + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+			patterns[1] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+		}else{
+			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
+		}
 	}
 	
 	public void clear() {
@@ -37,7 +46,10 @@ public class ExamParser extends Parser{
 		if(response.contains("<code>1</code>") || response.contains("已无可用名额")){
 			getStatusPanel().success();
 			if(response.contains("<code>1</code>")){
-				for(Pattern examPattern: patterns){
+				for(Pattern examPattern : patterns){
+					if(examPattern == null){
+						continue;
+					}
 					Matcher m = examPattern.matcher(response);
 					if (m.find()) {
 						String kscc = m.group(1);
