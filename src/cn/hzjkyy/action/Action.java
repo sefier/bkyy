@@ -277,6 +277,10 @@ public class Action {
 					user.setDxyzm(null);
 					lastSendAt = 0;
 					throw new RetryException("短信验证码错误");
+				}else if(response.getResponseBody().contains("再次预约需在上次考试")){
+					throw new StopException("10日预约限制");
+				}else if(response.getResponseBody().contains("本功能只能预约本科目的补考")){
+					throw new StopException("不支持初考");
 				}
 				jlcParser.parse(response.getResponseBody());
 			}
