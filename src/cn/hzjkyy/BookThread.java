@@ -91,7 +91,7 @@ public class BookThread extends Thread {
 						if(exam != null){
 							try {
 								int wait = exam.sysj + explorer.getOffset();
-								Thread.sleep(wait < 15000 ? 15 : wait );
+								Thread.sleep(wait < 15000 ? 15000 : wait );
 							} catch (InterruptedException e) {
 							}
 						}
