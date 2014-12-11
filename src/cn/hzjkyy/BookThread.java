@@ -91,6 +91,8 @@ public class BookThread extends Thread {
 						if(exam != null){
 							try {
 								int wait = exam.sysj + explorer.getOffset();
+								applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
+								applicationLog.record("加上偏移量" + explorer.getOffset() + "，累计等待" + wait);
 								Thread.sleep(wait < 15000 ? 15000 : wait );
 							} catch (InterruptedException e) {
 							}
