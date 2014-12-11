@@ -161,7 +161,7 @@ public class Explorer {
 		        		
 		        		if(value != null){
 		        			try {
-		        				int sleep = Integer.parseInt(value);
+		        				int sleep = Integer.parseInt(value) + 1;
 		        				int second = sleep * 1000;
 		        				
 								Thread.sleep(second);
