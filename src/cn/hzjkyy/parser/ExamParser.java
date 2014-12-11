@@ -80,7 +80,7 @@ public class ExamParser extends Parser{
 							}catch(ParseException e){
 							}
 							
-							exam = new Exam(kscc, ksdd, ksrq, sysj);
+							exam = new Exam(kscc, ksdd, ksrq, sysj * 1000);
 							break;
 						}
 					}
