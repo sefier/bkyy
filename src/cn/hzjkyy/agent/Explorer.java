@@ -29,7 +29,7 @@ public class Explorer {
 		tabs.clear();
 		explorerLog.close();
 	}
-	private int offset = 9000;
+	private int offset = 3000;
 	
 	public int getOffset(){
 		return this.offset;
@@ -167,7 +167,7 @@ public class Explorer {
 								Thread.sleep(second);
 								if(sleep < 30000){
 									explorerLog.record("按钮点击过早，需要额外等待" + second);
-									offset += sleep;
+									offset += (sleep + 3000);
 									explorerLog.record("按钮点击过早，偏移量增加到" + offset);
 								}
 							} catch (NumberFormatException e) {

@@ -18,7 +18,7 @@ public class ExamParser extends Parser{
 	
 	public ExamParser(Plan plan, User user){
 		this.plan = plan;
-		String ksrq = "2014-\\d+-\\d+";
+		String ksrq = "2015-\\d+-\\d+";
 		
 		if(plan.getKsdd() != null && plan.getKsdd().length() == 7){
 			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");			

@@ -263,7 +263,7 @@ public class Action {
 		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
-		long wait = 30000;
+		long wait = 33000;
 		long startJlc = System.currentTimeMillis();
 		
 		do {
@@ -343,9 +343,9 @@ public class Action {
 			throw new SuccessException(m.find() ? m.group() : "2014-12-06");
 		}
 		
-//		if(response.getResponseBody().contains("请在次月再行预约")){
-//			throw new StopException("驾校名额已满");
-//		}
+		if(response.getResponseBody().contains("请在次月再行预约")){
+			throw new StopException("驾校名额已满");
+		}
 
 		if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
 			actionLog.record("预约考试成功！");
