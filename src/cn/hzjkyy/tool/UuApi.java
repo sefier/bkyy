@@ -201,7 +201,7 @@ public class UuApi {
 		String url = getServerUrl("code") + "/Upload/GetResult.aspx?KEY=" + userKey + "&ID=" + codeID + "&Random=" + System.currentTimeMillis();
 		String result = "-3";
 		int timer = 0;
-		while (result.equals("-3") && timer < timeOut) {
+		while ((result.equals("-3") || result.equals("")) && timer < timeOut) {
 			result = uuGetUrl(url, new HashMap(), false);
 			try {
 				Thread.sleep(3000);
