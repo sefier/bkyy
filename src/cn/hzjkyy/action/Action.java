@@ -301,6 +301,8 @@ public class Action {
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
 		try {
+			actionLog.record("获取考试信息前要等待" + wait);
+			actionLog.record("获取考试信息前要额外等待" + this.getOffset());
 			Thread.sleep(wait + this.getOffset());
 		} catch (InterruptedException e) {
 		}
