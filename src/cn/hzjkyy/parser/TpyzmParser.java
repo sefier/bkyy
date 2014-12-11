@@ -19,6 +19,7 @@ public class TpyzmParser extends Parser {
 	
 	public void reportError() {
 		if(codeId != null){
+			System.out.println("汇报验证码识别错误：" + codeId);
 			yzmDecoder.reportError(codeId);
 		}
 	}
