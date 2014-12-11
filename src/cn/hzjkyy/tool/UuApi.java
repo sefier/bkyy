@@ -68,7 +68,7 @@ public class UuApi {
 	// 客户机的mac地址,服务器暂时没有用,后期准备用于绑定mac地址
 	// 赋值方法：
 	// $obj->macAddress='00e021ac7d';
-	public int timeOut = 60000;
+	public int timeOut = 24000;
 
 	// 超时时间,建议不要改动此值 赋值方法： $obj->timeOut=60000;
 
@@ -201,14 +201,19 @@ public class UuApi {
 		String url = getServerUrl("code") + "/Upload/GetResult.aspx?KEY=" + userKey + "&ID=" + codeID + "&Random=" + System.currentTimeMillis();
 		String result = "-3";
 		int timer = 0;
-		while (result == "-3" && timer < timeOut) {
+		while (result.equals("-3") && timer < timeOut) {
 			result = uuGetUrl(url, new HashMap(), false);
+			try {
+				Thread.sleep(3000);
+				timer += 3000;
+			} catch (InterruptedException e) {
+			}
 			// usleep(100000);
 		}
 		// curl_close($this->uuUrl);
-		if (result == "-3") {
-			return "-1002";
-		}
+//		if (result == "-3") {
+//			return "-1002";
+//		}
 		return result;
 	}
 
@@ -357,21 +362,12 @@ public class UuApi {
 		System.out.println(s.toLowerCase());
 		UuApi a=new UuApi();
 		a.setSoftInfo("101749", "c5964b2abbc6427f886d2deda1973a2a");
-		a.userLogin("sefier", "iamtmx203");
-		String l=a.upload("/Users/sefier/Downloads/verifycode.jpeg", "8001",false);
+		a.userLogin("sefier", "AnLu@203");
+		String l=a.upload("/Users/sefier/Downloads/car/4a5daacc7488d760b3544922682277ec_261838_261858.bmp", "8001",false);
 		
 		String r;
-		do {
-			r=a.getResult(l); 
-			System.out.println(r);
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}while(r.equals("-3"));
-	    
+		r=a.getResult(l); 
+		System.out.println(r);	    
 	}
 
 	static class Md5 {

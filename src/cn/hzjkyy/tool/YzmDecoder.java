@@ -47,20 +47,8 @@ public class YzmDecoder {
 		}
 
 		String l = uuApi.upload(filePath, "8002", false);
-		
-		String r = null;
-		for(int i = 0; i < 6; i++){
-			r = uuApi.getResult(l);
-			System.out.println("识别结果：" + r);
-			if(r.equals("-3")){
-				try {
-					Thread.sleep(3000);
-				} catch (InterruptedException e) {
-				}				
-			}else{
-				break;
-			}
-		}
+		String r = uuApi.getResult(l);
+		System.out.println("识别结果：" + r);
 		
 		decodeResult.put(l, r);
 		
