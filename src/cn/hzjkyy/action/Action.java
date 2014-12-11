@@ -292,7 +292,11 @@ public class Action {
 				jlcParser.parse(response.getResponseBody());
 			}
 		}while(!jlcParser.getStatusPanel().isSuccess());
-		wait -= (System.currentTimeMillis() - startJlc);
+		long costed = System.currentTimeMillis() - startJlc; 
+		actionLog.record("获取考试信息前已花费" + costed);
+		costed = costed > 10000 ? 0 : costed;
+		actionLog.record("为了排除考试信息错误，获取考试信息前已花费时间修正为：" + costed);
+		wait -= costed;
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
 		
@@ -303,6 +307,7 @@ public class Action {
 		try {
 			actionLog.record("获取考试信息前要等待" + wait);
 			actionLog.record("获取考试信息前要额外等待" + this.getOffset());
+			actionLog.record("获取考试信息前最终实际等待" + (wait + this.getOffset()));
 			Thread.sleep(wait + this.getOffset());
 		} catch (InterruptedException e) {
 		}

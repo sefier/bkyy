@@ -202,13 +202,12 @@ public class UuApi {
 		String result = "-3";
 		int timer = 0;
 		while ((result.equals("-3") || result.equals("")) && timer < timeOut) {
-			result = uuGetUrl(url, new HashMap(), false);
 			try {
 				Thread.sleep(3000);
 				timer += 3000;
 			} catch (InterruptedException e) {
 			}
-			// usleep(100000);
+			result = uuGetUrl(url, new HashMap(), false);
 		}
 		// curl_close($this->uuUrl);
 //		if (result == "-3") {

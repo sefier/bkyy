@@ -27,7 +27,7 @@ public class BookThread extends Thread {
 	
 	public void run() {
 		//创建日志
-		Log.init(isTest ? 1 : 5000);
+		Log.init(isTest ? 1 : 2);
 		Log applicationLog = Log.getLog(plan, "application");
 		
 		//初始化
@@ -93,6 +93,7 @@ public class BookThread extends Thread {
 								int wait = exam.sysj + explorer.getOffset();
 								applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
 								applicationLog.record("加上偏移量" + explorer.getOffset() + "，累计等待" + wait);
+								applicationLog.record("最终实际等待" + (wait < 15000 ? 15000 : wait ));
 								Thread.sleep(wait < 15000 ? 15000 : wait );
 							} catch (InterruptedException e) {
 							}
