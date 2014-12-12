@@ -165,9 +165,9 @@ public class Explorer {
 		        				int second = sleep * 1000;
 		        				
 								Thread.sleep(second);
-								if(sleep < 30000){
+								if(second < 30000){
 									explorerLog.record("按钮点击过早，需要额外等待" + second);
-									offset += (sleep + 3000);
+									offset += (second + 3000);
 									explorerLog.record("按钮点击过早，偏移量增加到" + offset);
 								}
 							} catch (NumberFormatException e) {
