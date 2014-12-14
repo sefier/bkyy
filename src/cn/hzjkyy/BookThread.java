@@ -1,5 +1,8 @@
 package cn.hzjkyy;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import cn.hzjkyy.action.Action;
 import cn.hzjkyy.agent.Explorer;
 import cn.hzjkyy.agent.PauseException;
@@ -123,8 +126,14 @@ public class BookThread extends Thread {
 				applicationLog.record("停止预约：" + se.getReason());
 				break;
 			} catch (SuccessException se) {
-				success = true;
-				ksrq = se.getKsrq();
+				Pattern pattern = Pattern.compile(plan.getKsrqFormat());
+				Matcher m = pattern.matcher(se.getKsrq());
+				if(m.find()){
+					success = true;
+					ksrq = se.getKsrq();
+				}else if(plan.seIncrease()){
+					break;
+				}
 			}
 		}while(!success);
 		

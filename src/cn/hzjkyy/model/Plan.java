@@ -8,6 +8,15 @@ public class Plan {
 	private String startKsrq;
 	private String endKsrq;
 
+	private String ksrqFormat = "2015-\\d+-\\d+";
+	public String getKsrqFormat(){
+		return ksrqFormat;
+	}
+	private int seTimes = 0;
+	public boolean seIncrease() {
+		seTimes += 1;
+		return seTimes > 3;
+	}
 
 	public int getId() {
 		return id;
