@@ -84,6 +84,15 @@ public class Action {
 		return calendar.getTimeInMillis();
 	}
 	
+	public long getTimestamp(int hour, int minute, int second) {
+		Calendar calendar = new GregorianCalendar();
+		calendar.set(Calendar.HOUR_OF_DAY, hour);
+		calendar.set(Calendar.MINUTE, minute);
+		calendar.set(Calendar.SECOND, second);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar.getTimeInMillis();		
+	}
+	
 	public Action(Tab tab, User user, Device device, Plan plan, boolean isTest){
 		this.tab = tab;
 		this.user = user;
@@ -255,6 +264,13 @@ public class Action {
 		
 		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
 			throw new StopException("迟迟等不到短信验证码");
+		}
+		//获取考试流水要等待
+		if(plan.getId() % 2 == 0){
+			int second = 24 + plan.getId() % 8;
+			if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 59, second)){
+				waitUntil(getTimestamp(8, 59, second));
+			}
 		}
 		
 		//获取考试流水
