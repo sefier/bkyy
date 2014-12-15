@@ -233,13 +233,13 @@ public class Action {
 		}while(!tpyzmParser.getStatusPanel().isSuccess());
 		user.setTpyzm(tpyzmParser.getTpyzm());
 		
-		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 25 * 60 * 1000 > lastSendAt){
+		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 35 * 60 * 1000 > lastSendAt){
 			sendYzm();
 		}
 		
 		//持续25分钟，获取短信验证码，如果25分钟内没有获取到，就会休息预约
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-			for(int i = 0; i < 75; i++){
+			for(int i = 0; i < 90; i++){
 				String dxYzm = planClient.yzmQuery(plan);
 				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
 					user.setDxyzm(dxYzm);
