@@ -54,7 +54,7 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(8, 40) + (long)((serverId % 350) * 1000 * 1.2));
+		waitUntil(getTimestamp(8, 40) + (serverId % 350) * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);
