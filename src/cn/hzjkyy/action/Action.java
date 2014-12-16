@@ -279,7 +279,7 @@ public class Action {
 		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
-		long wait = 33000;
+		long wait = 37000;
 		long startJlc = System.currentTimeMillis();
 		
 		do {
