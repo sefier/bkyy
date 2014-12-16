@@ -340,8 +340,7 @@ public class Action {
 		ExamParser examParser = new ExamParser(plan, user);
 		
 		if(plan.getId() % 10 != 0){
-			int second = 16 + plan.getId() % 10;
-			if(System.currentTimeMillis() > getTimestamp(8, 59, second) && System.currentTimeMillis() < getTimestamp(9, 0, plan.getId() % 10 / 2)){
+			if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, plan.getId() % 10 / 2)){
 				waitUntil(getTimestamp(9, 0, plan.getId() % 10 / 2));
 			}
 		}
