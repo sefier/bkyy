@@ -309,9 +309,15 @@ public class Action {
 			}
 		}while(!jlcParser.getStatusPanel().isSuccess());
 		long costed = System.currentTimeMillis() - startJlc; 
+		long exactCosted = System.currentTimeMillis() - jlcRequest.getSentAt();
+		if(exactCosted < costed){
+			costed = exactCosted;
+		}
+		
 		actionLog.record("获取考试信息前已花费" + costed);
-		costed = costed > 10000 ? 0 : costed;
-		actionLog.record("为了排除考试信息错误，获取考试信息前已花费时间修正为：" + costed);
+		costed = costed > 10000 ? 10000 : costed;
+		actionLog.record("为防止时间过多，获取考试信息前已花费修正为" + costed);
+		
 		wait -= costed;
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
