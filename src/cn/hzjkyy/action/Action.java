@@ -266,8 +266,8 @@ public class Action {
 			throw new StopException("迟迟等不到短信验证码");
 		}
 		//获取考试流水要等待
-		if(plan.getId() % 2 == 0){
-			int second = 24 + plan.getId() % 8;
+		if(plan.getId() % 10 != 0){
+			int second = 16 + plan.getId() % 10;
 			if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 59, second)){
 				waitUntil(getTimestamp(8, 59, second));
 			}
@@ -321,8 +321,7 @@ public class Action {
 		wait -= costed;
 		String jlc = jlcParser.getJlcs()[0];
 		String kskm = jlcParser.getKskm();
-		
-		
+				
 		user.setKskm(kskm);
 		user.setJlc(jlc);
 		actionLog.record("获取考试流水成功：");
@@ -340,6 +339,13 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
+		if(plan.getId() % 10 != 0){
+			int second = 16 + plan.getId() % 10;
+			if(System.currentTimeMillis() > getTimestamp(8, 59, second) && System.currentTimeMillis() < getTimestamp(9, 0, 1)){
+				waitUntil(getTimestamp(9, 0, plan.getId() % 10 / 2));
+			}
+		}
+
 		do{
 			actionLog.record("获取考试信息...");
 			Response response = tab.visit(examRequest);

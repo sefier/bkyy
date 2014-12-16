@@ -9,7 +9,7 @@ public class Test {
 		Pattern testPattern = Pattern.compile("(2015-\\d+-\\d+)<");
 		Matcher m = testPattern.matcher("2015-01-1<123123");
 		if(m.find()){
-			System.out.println(m.group(1));
+			System.out.println(5 / 2);
 		}
 
 	}
