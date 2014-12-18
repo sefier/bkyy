@@ -248,14 +248,14 @@ public class Action {
 		
 		//持续25分钟，获取短信验证码，如果25分钟内没有获取到，就会休息预约
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-			for(int i = 0; i < 90; i++){
+			for(int i = 0; i < 180; i++){
 				String dxYzm = planClient.yzmQuery(plan);
 				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
 					user.setDxyzm(dxYzm);
 					break;
 				}else{
 					try {
-						Thread.sleep(20000);
+						Thread.sleep(10000);
 					} catch (InterruptedException e) {
 					}
 				}
