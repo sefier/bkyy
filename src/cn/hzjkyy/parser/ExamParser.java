@@ -87,8 +87,11 @@ public class ExamParser extends Parser{
 							//如果预约时间预计会超过9点08秒，并且选的是枫桦路，那么其中70%要改选江涵路
 							if(ksdd.equals("3301034") && plan.getId() % 10 < 7){
 								Calendar calendar = new GregorianCalendar();
+								int hour = calendar.get(Calendar.HOUR_OF_DAY);
+								int minute = calendar.get(Calendar.MINUTE);
 								int second = calendar.get(Calendar.SECOND);
-								if(second + sysj > 8){
+
+								if(hour == 9 && minute == 0 && (second + sysj > 8)){
 									exam.ksdd = "3301022";									
 								}
 							}

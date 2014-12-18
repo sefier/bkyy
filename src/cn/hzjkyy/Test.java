@@ -7,7 +7,10 @@ public class Test {
 
 	public static void main(String[] args) {
 		Calendar calendar = new GregorianCalendar();
-		System.out.println(calendar.get(Calendar.SECOND));
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minute = calendar.get(Calendar.MINUTE);
+		int second = calendar.get(Calendar.SECOND);
+		System.out.println(hour + ":" + minute + ":" + second);
 	}
 
 }
