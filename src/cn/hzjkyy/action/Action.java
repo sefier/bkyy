@@ -227,20 +227,22 @@ public class Action {
 //		actionLog.record("同意操作成功");
 
 		//获取图片验证码
-		actionLog.record("系统开始获取图片验证码");
-		TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
-		Request tpyzmRequest = tpyzmGenerator.generate();
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
-		
-		do {
-			actionLog.record("获取图片验证码...");
-			Response response = tab.visit(tpyzmRequest);
-			if(response.getStatusPanel().isSuccess()){
-				user.setTpyzm(null);
-				tpyzmParser.parse(response.getResponseBody());
-			}
-		}while(!tpyzmParser.getStatusPanel().isSuccess());
-		user.setTpyzm(tpyzmParser.getTpyzm());
+		if(user.getTpyzm() == null || user.getTpyzm().equals("")){
+			actionLog.record("系统开始获取图片验证码");
+			TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
+			Request tpyzmRequest = tpyzmGenerator.generate();
+			
+			do {
+				actionLog.record("获取图片验证码...");
+				Response response = tab.visit(tpyzmRequest);
+				if(response.getStatusPanel().isSuccess()){
+					user.setTpyzm(null);
+					tpyzmParser.parse(response.getResponseBody());
+				}
+			}while(!tpyzmParser.getStatusPanel().isSuccess());
+			user.setTpyzm(tpyzmParser.getTpyzm());			
+		}
 		
 		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 35 * 60 * 1000 > lastSendAt){
 			sendYzm();
