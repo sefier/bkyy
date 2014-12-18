@@ -313,7 +313,7 @@ public class Action {
 		}
 		
 		actionLog.record("获取考试信息前已花费" + costed);
-		costed = costed > 10000 ? 10000 : costed;
+		costed = costed > 30000 ? 10000 : costed;
 		actionLog.record("为防止时间过多，获取考试信息前已花费修正为" + costed);
 		
 		wait -= costed;
