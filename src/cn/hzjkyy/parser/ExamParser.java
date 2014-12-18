@@ -85,10 +85,12 @@ public class ExamParser extends Parser{
 							
 							exam = new Exam(kscc, ksdd, ksrq, sysj * 1000);
 							//如果预约时间预计会超过9点08秒，并且选的是枫桦路，那么其中70%要改选江涵路
-							Calendar calendar = new GregorianCalendar();
-							int second = calendar.get(Calendar.SECOND);
-							if(second + sysj > 8 && ksdd.equals("3301034") && plan.getId() % 10 < 7){
-								exam.ksdd = "3301022";
+							if(ksdd.equals("3301034") && plan.getId() % 10 < 7){
+								Calendar calendar = new GregorianCalendar();
+								int second = calendar.get(Calendar.SECOND);
+								if(second + sysj > 8){
+									exam.ksdd = "3301022";									
+								}
 							}
 
 							break;
