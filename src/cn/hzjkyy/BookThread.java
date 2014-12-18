@@ -93,10 +93,9 @@ public class BookThread extends Thread {
 						exam = action.detect(planClient);
 						if(exam != null){
 							try {
-								int wait = exam.sysj + explorer.getOffset();
+								int wait = exam.sysj;
 								applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
-								applicationLog.record("加上偏移量" + explorer.getOffset() + "，累计等待" + wait);
-								//applicationLog.record("最终实际等待" + (wait < 15000 ? 15000 : wait ));
+								applicationLog.record("累计等待" + wait);
 								Thread.sleep(wait);
 							} catch (InterruptedException e) {
 							}
