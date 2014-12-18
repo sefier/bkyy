@@ -266,11 +266,9 @@ public class Action {
 			throw new StopException("迟迟等不到短信验证码");
 		}
 		//获取考试流水要等待
-		if(plan.getId() % 10 != 0){
-			int second = 14 + plan.getId() % 10;
-			if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 59, second)){
-				waitUntil(getTimestamp(8, 59, second));
-			}
+		int second = 15;
+		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 59, second)){
+			waitUntil(getTimestamp(8, 59, second));
 		}
 		
 		//获取考试流水
@@ -339,10 +337,8 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
-		if(plan.getId() % 10 != 0){
-			if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, plan.getId() % 10 / 2)){
-				waitUntil(getTimestamp(9, 0, plan.getId() % 10 / 2));
-			}
+		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
+			waitUntil(getTimestamp(9, 0, 0));
 		}
 
 		do{
