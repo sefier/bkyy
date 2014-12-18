@@ -36,7 +36,7 @@ public class BookThread extends Thread {
 		//初始化
 		User user = new User(plan.getSfzmhm(), plan.getPass());
 		Device device = new Device(null);
-		Explorer explorer = new Explorer(plan);
+		Explorer explorer = new Explorer(plan, 60 * 1000);
 		Tab mainTab = explorer.newTab();
 		Action action = new Action(mainTab, user, device, plan, isTest);
 
