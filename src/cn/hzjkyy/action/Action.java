@@ -288,7 +288,7 @@ public class Action {
 			Response response = tab.visit(jlcRequest);
 			if(response.getStatusPanel().isSuccess()){
 				if(response.getResponseBody().contains("不能重复预约")){
-					Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
+					Pattern ksrqPattern = Pattern.compile("2015-\\d+-\\d+");
 					Matcher m = ksrqPattern.matcher(response.getResponseBody());
 					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
 				}else if(response.getResponseBody().contains("图片验证码有误")){
