@@ -51,6 +51,7 @@ public class Action {
 	protected Log actionLog;
 	private YzmDecoder yzmDecoder;
 	private Set<String> oldYzms = new HashSet<String>();
+	private Set<String> oldResendYzms = new HashSet<String>();
 	public void close() {
 		actionLog.close();
 	}
@@ -248,12 +249,18 @@ public class Action {
 			sendYzm();
 		}
 		
-		//持续25分钟，获取短信验证码，如果25分钟内没有获取到，就会休息预约
+		//持续300分钟，获取短信验证码，如果300分钟内没有获取到，就会休息预约
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-			for(int i = 0; i < 180; i++){
+			for(int i = 0; i < 1800; i++){
 				String dxYzm = planClient.yzmQuery(plan);
+				
 				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
 					user.setDxyzm(dxYzm);
+					break;
+				}else if(dxYzm != null && dxYzm.length() == 7 && !oldResendYzms.contains(dxYzm)){ //重新发送验证码
+					oldResendYzms.add(dxYzm);
+					sendYzm();
+				}else if(dxYzm != null && dxYzm.length() == 8){ //放号结束了
 					break;
 				}else{
 					try {
