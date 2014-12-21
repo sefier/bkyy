@@ -371,7 +371,7 @@ public class Action {
 		Response response = tab.visit(bookRequest);
 		
 		if(response.getResponseBody().contains("重复预约")){
-			Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
+			Pattern ksrqPattern = Pattern.compile("2015-\\d+-\\d+");
 			Matcher m = ksrqPattern.matcher(response.getResponseBody());
 			throw new SuccessException(m.find() ? m.group() : "2014-12-06");
 		}
