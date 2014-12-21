@@ -2,9 +2,7 @@ package cn.hzjkyy.parser;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -25,8 +23,8 @@ public class ExamParser extends Parser{
 		if(plan.getKsdd() != null && plan.getKsdd().length() == 7){
 			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(" + plan.getKsdd() + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");			
 		}else if(user.getKskm().equals("3")){
-			//30%的几率预约江涵路
-			String preferKsdd = plan.getId() % 10 < 3 ? "3301022" : "3301034";
+			//50%的几率预约江涵路
+			String preferKsdd = plan.getId() % 10 < 5 ? "3301022" : "3301034";
 			patterns[0] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(" + preferKsdd + ")</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
 			patterns[1] = Pattern.compile("<item.*?<kscc>(\\d+)</kscc>.*?<sysj>(\\d+)</sysj>.*?<ksdd>(\\d+)</ksdd><ksrq>(" + ksrq + ")</ksrq></item>");
 		}else{
@@ -84,17 +82,17 @@ public class ExamParser extends Parser{
 							}
 							
 							exam = new Exam(kscc, ksdd, ksrq, sysj * 1000);
-							//如果预约时间预计会超过9点08秒，并且选的是枫桦路，那么其中70%要改选江涵路
-							if(ksdd.equals("3301034") && plan.getId() % 10 < 7){
-								Calendar calendar = new GregorianCalendar();
-								int hour = calendar.get(Calendar.HOUR_OF_DAY);
-								int minute = calendar.get(Calendar.MINUTE);
-								int second = calendar.get(Calendar.SECOND);
-								
-								if(hour == 9 && minute == 0 && second + sysj > 8){
-									exam.ksdd = "3301022";
-								}
-							}
+//							//如果预约时间预计会超过9点08秒，并且选的是枫桦路，那么其中70%要改选江涵路
+//							if(ksdd.equals("3301034") && plan.getId() % 10 < 7){
+//								Calendar calendar = new GregorianCalendar();
+//								int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//								int minute = calendar.get(Calendar.MINUTE);
+//								int second = calendar.get(Calendar.SECOND);
+//								
+//								if(hour == 9 && minute == 0 && second + sysj > 8){
+//									exam.ksdd = "3301022";
+//								}
+//							}
 
 							break;
 						}
