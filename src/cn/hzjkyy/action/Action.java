@@ -368,21 +368,24 @@ public class Action {
 		BookGenerator bookGenerator = new BookGenerator(user, exam);
 		Request bookRequest = bookGenerator.generate();
 
-		Response response = tab.visit(bookRequest);
-		
-		if(response.getResponseBody().contains("重复预约")){
-			Pattern ksrqPattern = Pattern.compile("2015-\\d+-\\d+");
-			Matcher m = ksrqPattern.matcher(response.getResponseBody());
-			throw new SuccessException(m.find() ? m.group() : "2014-12-06");
-		}
-		
-		if(response.getResponseBody().contains("请在次月再行预约")){
-			throw new StopException("驾校名额已满");
-		}
+		// 至少尝试重新预约3次
+		for(int i = 0; i < 3; i++){
+			Response response = tab.visit(bookRequest);
+			
+			if(response.getResponseBody().contains("重复预约")){
+				Pattern ksrqPattern = Pattern.compile("2015-\\d+-\\d+");
+				Matcher m = ksrqPattern.matcher(response.getResponseBody());
+				throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+			}
+			
+			if(response.getResponseBody().contains("请在次月再行预约")){
+				throw new StopException("驾校名额已满");
+			}
 
-		if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
-			actionLog.record("预约考试成功！");
-			return true;
+			if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
+				actionLog.record("预约考试成功！");
+				return true;
+			}
 		}
 		
 		return false;
