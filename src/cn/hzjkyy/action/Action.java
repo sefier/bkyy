@@ -208,7 +208,10 @@ public class Action {
 			}
 		}while(!sendParser.getStatusPanel().isSuccess());
 		lastSendAt = System.currentTimeMillis();
-		
+		try {
+			Thread.sleep(30000);
+		} catch (InterruptedException e) {
+		}
 	}
 	private long lastSendAt = 0;
 	public Exam detect(PlanClient planClient) throws UnloginException, RetryException, StopException, PauseException, SuccessException {
