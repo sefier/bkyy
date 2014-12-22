@@ -288,9 +288,9 @@ public class Action {
 			Response response = tab.visit(jlcRequest);
 			if(response.getStatusPanel().isSuccess()){
 				if(response.getResponseBody().contains("不能重复预约")){
-					Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
+					Pattern ksrqPattern = Pattern.compile("2015-\\d+-\\d+");
 					Matcher m = ksrqPattern.matcher(response.getResponseBody());
-					throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+					throw new SuccessException(m.find() ? m.group() : "2014-01-01");
 				}else if(response.getResponseBody().contains("图片验证码有误")){
 					user.setTpyzm(null);
 					tpyzmParser.reportError();
@@ -371,9 +371,9 @@ public class Action {
 		Response response = tab.visit(bookRequest);
 		
 		if(response.getResponseBody().contains("重复预约")){
-			Pattern ksrqPattern = Pattern.compile("2014-\\d+-\\d+");
+			Pattern ksrqPattern = Pattern.compile("2015-\\d+-\\d+");
 			Matcher m = ksrqPattern.matcher(response.getResponseBody());
-			throw new SuccessException(m.find() ? m.group() : "2014-12-06");
+			throw new SuccessException(m.find() ? m.group() : "2014-01-01");
 		}
 		
 		if(response.getResponseBody().contains("请在次月再行预约")){
