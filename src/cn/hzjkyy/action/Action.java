@@ -248,9 +248,9 @@ public class Action {
 			sendYzm();
 		}
 		
-		//持续25分钟，获取短信验证码，如果25分钟内没有获取到，就会休息预约
+		//持续45分钟，获取短信验证码，如果45分钟内没有获取到，就会休息预约
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-			for(int i = 0; i < 180; i++){
+			for(int i = 0; i < 270; i++){
 				String dxYzm = planClient.yzmQuery(plan);
 				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
 					user.setDxyzm(dxYzm);
