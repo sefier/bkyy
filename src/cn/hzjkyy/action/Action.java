@@ -269,6 +269,9 @@ public class Action {
 		}
 		//获取考试流水要等待
 		int second = 10;
+		if(plan.getId() % 20 == 0){
+			second = 0;
+		}
 		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 59, second)){
 			waitUntil(getTimestamp(8, 59, second));
 		}
@@ -348,7 +351,11 @@ public class Action {
 		ExamParser examParser = new ExamParser(plan, user);
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-			waitUntil(getTimestamp(9, 0, 0));
+			long waitToQuery = getTimestamp(9, 0, 0);
+			if(plan.getId() % 20 == 1){
+				waitToQuery -= 500;
+			}
+			waitUntil(waitToQuery);
 		}
 
 		do{
