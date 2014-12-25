@@ -297,8 +297,8 @@ public class Action {
 					throw new RetryException("图片验证码识别错误");
 				}else if(response.getResponseBody().contains("短信验证码有误")){
 					oldYzms.add(user.getDxyzm());
-					user.setDxyzm(null);
-					lastSendAt = 0;
+//					user.setDxyzm(null);
+//					lastSendAt = 0;
 					throw new RetryException("短信验证码错误");
 				}else if(response.getResponseBody().contains("再次预约需在上次考试")){
 					if(plan.seIncrease()){
