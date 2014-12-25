@@ -243,14 +243,15 @@ public class Action {
 			}while(!tpyzmParser.getStatusPanel().isSuccess());
 			user.setTpyzm(tpyzmParser.getTpyzm());			
 		}
-		
-		if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 35 * 60 * 1000 > lastSendAt){
-			sendYzm();
-		}
-		
-		//持续45分钟，获取短信验证码，如果45分钟内没有获取到，就会休息预约
+				
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
+			//持续45分钟，获取短信验证码，如果45分钟内没有获取到，就会休息预约
 			for(int i = 0; i < 270; i++){
+				
+				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
+					sendYzm();
+				}
+				
 				String dxYzm = planClient.yzmQuery(plan);
 				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
 					user.setDxyzm(dxYzm);
@@ -297,8 +298,7 @@ public class Action {
 					throw new RetryException("图片验证码识别错误");
 				}else if(response.getResponseBody().contains("短信验证码有误")){
 					oldYzms.add(user.getDxyzm());
-//					user.setDxyzm(null);
-//					lastSendAt = 0;
+					user.setDxyzm(null);
 					throw new RetryException("短信验证码错误");
 				}else if(response.getResponseBody().contains("再次预约需在上次考试")){
 					if(plan.seIncrease()){
