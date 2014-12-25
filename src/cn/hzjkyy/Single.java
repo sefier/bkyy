@@ -59,23 +59,31 @@ public class Single {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);
 			
-			if(signal == 1){//紧急状态
-				status = 1;
-			}else if(signal == 3){//停止状态
-				status = 3;
-				break;
-			}else if(signal == 2 && status == 1){
-				status = 0;
-			}
-			serverLog("生成服务器指令：" + status);
-			
-			for(int i = 0; i < 3; i++){
-				reAssignStatus(plans, size);
-				serverLog("重新生成服务器指令：" + status);
+			if(signal == 5){
+				serverLog("等待预约开始指令");
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(15000);
 				} catch (InterruptedException e) {
 				}
+			}else{
+				if(signal == 1){//紧急状态
+					status = 1;
+				}else if(signal == 3){//停止状态
+					status = 3;
+					break;
+				}else if(signal == 2 && status == 1){
+					status = 0;
+				}
+				serverLog("生成服务器指令：" + status);
+				
+				for(int i = 0; i < 3; i++){
+					reAssignStatus(plans, size);
+					serverLog("重新生成服务器指令：" + status);
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+					}
+				}				
 			}
 		}while(true);
 	}
