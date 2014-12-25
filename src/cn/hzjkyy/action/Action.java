@@ -349,7 +349,6 @@ public class Action {
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
 			long waitToQuery = getTimestamp(9, 0, 0);
-			waitToQuery += 500;
 			waitUntil(waitToQuery);
 		}
 
