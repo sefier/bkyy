@@ -225,24 +225,6 @@ public class Action {
 //			}			
 //		}while(!agreeParser.getStatusPanel().isSuccess());
 //		actionLog.record("同意操作成功");
-
-		//获取图片验证码
-		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
-		if(user.getTpyzm() == null || user.getTpyzm().equals("")){
-			actionLog.record("系统开始获取图片验证码");
-			TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
-			Request tpyzmRequest = tpyzmGenerator.generate();
-			
-			do {
-				actionLog.record("获取图片验证码...");
-				Response response = tab.visit(tpyzmRequest);
-				if(response.getStatusPanel().isSuccess()){
-					user.setTpyzm(null);
-					tpyzmParser.parse(response.getResponseBody());
-				}
-			}while(!tpyzmParser.getStatusPanel().isSuccess());
-			user.setTpyzm(tpyzmParser.getTpyzm());			
-		}
 				
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
 			//持续45分钟，获取短信验证码，如果45分钟内没有获取到，就会休息预约
@@ -264,10 +246,29 @@ public class Action {
 				}
 			}			
 		}
-		
+
 		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
 			throw new StopException("迟迟等不到短信验证码");
 		}
+
+		//获取图片验证码
+		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
+		if(user.getTpyzm() == null || user.getTpyzm().equals("")){
+			actionLog.record("系统开始获取图片验证码");
+			TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
+			Request tpyzmRequest = tpyzmGenerator.generate();
+			
+			do {
+				actionLog.record("获取图片验证码...");
+				Response response = tab.visit(tpyzmRequest);
+				if(response.getStatusPanel().isSuccess()){
+					user.setTpyzm(null);
+					tpyzmParser.parse(response.getResponseBody());
+				}
+			}while(!tpyzmParser.getStatusPanel().isSuccess());
+			user.setTpyzm(tpyzmParser.getTpyzm());			
+		}
+
 		//获取考试流水要等待
 		int second = 50;
 		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 58, second)){
