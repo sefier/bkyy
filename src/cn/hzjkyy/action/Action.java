@@ -274,7 +274,7 @@ public class Action {
 		//获取考试流水要等待
 		int second = 50;
 		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 58, second)){
-			waitUntil(getTimestamp(8, 59, second));
+			waitUntil(getTimestamp(8, 58, second));
 		}
 		
 		//获取考试流水
