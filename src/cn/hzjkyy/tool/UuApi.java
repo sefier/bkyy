@@ -21,6 +21,7 @@ import org.apache.commons.httpclient.methods.multipart.FilePart;
 import org.apache.commons.httpclient.methods.multipart.MultipartRequestEntity;
 import org.apache.commons.httpclient.methods.multipart.Part;
 import org.apache.commons.httpclient.methods.multipart.StringPart;
+import org.apache.http.client.config.RequestConfig;
 
 /*
  * 说明：此类函数是优优云图片识别平台的API接口,调用类中的函数可以进行图片识别 优优云官网：www.uuwise.com QQ：87280085
@@ -234,6 +235,12 @@ public class UuApi {
 		try {
 			uid = "100";
 			HttpClient client = new HttpClient();
+			
+			client.getHttpConnectionManager().
+		        getParams().setConnectionTimeout(30000);
+			client.getHttpConnectionManager().
+		        getParams().setSoTimeout(30000);
+
 			List<Header> headers = new ArrayList<Header>();
 			headers.add(new Header("Accept", "text/html, application/xhtml+xml, */*"));
 			headers.add(new Header("Accept-Language", "zh-CN"));
@@ -252,6 +259,7 @@ public class UuApi {
 					// headers.add(new Header("Content-Type",
 					// "multipart/form-data"));
 					PostMethod post = new PostMethod(url);
+
 					setHeaders(post);
 					Part[] parts = new Part[postData.size()];
 					int temp = 0;
