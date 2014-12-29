@@ -273,8 +273,9 @@ public class Action {
 
 		//获取考试流水要等待
 		int second = 50;
+		int testOffset = plan.getId() % 3  * 10 * 1000;
 		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 58, second)){
-			waitUntil(getTimestamp(8, 58, second));
+			waitUntil(getTimestamp(8, 58, second) + testOffset);
 		}
 		
 		//获取考试流水
