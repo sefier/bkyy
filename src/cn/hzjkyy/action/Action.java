@@ -351,9 +351,11 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
+		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
+			int testBookOffset = (plan.getId() % 3) * 1000;
 			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery);
+			waitUntil(waitToQuery + testBookOffset);
 		}
 
 		do{
