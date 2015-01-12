@@ -15,7 +15,10 @@ public class YzmDecoder {
 	public YzmDecoder() {
 		uuApi = new UuApi();
 		uuApi.setSoftInfo("101749", "c5964b2abbc6427f886d2deda1973a2a");
-		uuApi.userLogin("sefier", "AnLu@203");
+		String result = "";
+		do {
+			result = uuApi.userLogin("sefier", "AnLu@203");
+		}while(result.isEmpty());
 	}
 	
 	private static Map<String, String> decodeResult = new HashMap<String, String>();
