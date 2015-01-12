@@ -229,8 +229,8 @@ public class Action {
 		//获取图片验证码
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
-			//持续45分钟，获取短信验证码，如果45分钟内没有获取到，就会休息预约
-			for(int i = 0; i < 270; i++){
+			//持续45分钟，获取短信验证码，如果60分钟内没有获取到，就会休息预约
+			for(int i = 0; i < 360; i++){
 				
 				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
 					sendYzm();
@@ -353,7 +353,7 @@ public class Action {
 		
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-			int testBookOffset = (plan.getId() % 3) * 1000;
+			int testBookOffset = (plan.getId() % 2) * 1000;
 			long waitToQuery = getTimestamp(9, 0, 0);
 			waitUntil(waitToQuery + testBookOffset);
 		}

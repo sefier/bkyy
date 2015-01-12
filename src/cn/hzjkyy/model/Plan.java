@@ -8,7 +8,7 @@ public class Plan {
 	private String startKsrq;
 	private String endKsrq;
 
-	private String ksrqFormat = "2015-\\d+-\\d+";
+	private String ksrqFormat = "2015-02-\\d+";
 	public String getKsrqFormat(){
 		return ksrqFormat;
 	}
