@@ -18,8 +18,8 @@ public class YzmDecoder {
 		String result = "";
 		do {
 			result = uuApi.userLogin("sefier", "AnLu@203");
-		}while(result.isEmpty());
-		System.out.println("登录结果：" + result);
+			System.out.println("登录结果：" + result);
+		}while(!result.equals("554752"));
 		decodeResult.put("-10000", "");
 	}
 	
