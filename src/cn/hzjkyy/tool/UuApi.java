@@ -372,6 +372,7 @@ public class UuApi {
 		a.userLogin("sefier", "AnLu@203");
 		String l=a.upload("/Users/sefier/Downloads/car/4a5daacc7488d760b3544922682277ec_261838_261858.bmp", "8001",false);
 		
+		System.out.println(l);
 		String r;
 		r=a.getResult(l); 
 		System.out.println(r);	    

@@ -19,6 +19,8 @@ public class YzmDecoder {
 		do {
 			result = uuApi.userLogin("sefier", "AnLu@203");
 		}while(result.isEmpty());
+		System.out.println("登录结果：" + result);
+		decodeResult.put("-10000", "");
 	}
 	
 	private static Map<String, String> decodeResult = new HashMap<String, String>();
@@ -32,6 +34,7 @@ public class YzmDecoder {
 	}
 	
 	public String decode(String yzmPic){
+		String l = "-10000";
 		String fileName = String.format("%s_%d", UUID.randomUUID().toString().replaceAll("-", ""), System.currentTimeMillis());
 		String filePath = Log.currentPath.resolve(fileName + ".jpeg").toString();
 		
@@ -46,14 +49,32 @@ public class YzmDecoder {
 			try (OutputStream stream = new FileOutputStream(file)) {
 			    stream.write(data);
 			}
-		} catch (IOException e) {
-		}
 
-		String l = uuApi.upload(filePath, "8002", false);
-		String r = uuApi.getResult(l);
-		System.out.println("识别结果：" + r);
-		
-		decodeResult.put(l, r);
+			//上传验证码图片
+			int tries = 0;
+			do {
+				try {
+					Thread.sleep(3000);
+				} catch (InterruptedException e) {
+				}
+
+				tries++;
+				l = uuApi.upload(filePath, "8002", false);
+				
+				if(tries > 3){
+					break;
+				}
+			}while(l.startsWith("-"));
+			
+			String r = uuApi.getResult(l);
+			
+			System.out.println("识别结果：" + r);
+			
+			decodeResult.put(l, r);
+		} catch (IOException e) {
+			System.out.println("上传验证码图片错误");
+			e.printStackTrace();
+		}
 		
 		return l;
 	}
