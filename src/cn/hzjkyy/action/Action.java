@@ -273,9 +273,8 @@ public class Action {
 
 		//获取考试流水要等待
 		int second = 50;
-		int testOffset = plan.getId() % 3  * 10 * 1000;
 		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 58, second)){
-			waitUntil(getTimestamp(8, 58, second) + testOffset);
+			waitUntil(getTimestamp(8, 58, second));
 		}
 		
 		//获取考试流水
@@ -353,9 +352,8 @@ public class Action {
 		
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-			int testBookOffset = (plan.getId() % 2) * 1000;
 			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery + testBookOffset);
+			waitUntil(waitToQuery);
 		}
 
 		do{
