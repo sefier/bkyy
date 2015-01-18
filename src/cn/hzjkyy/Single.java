@@ -12,7 +12,7 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static String programVersion = "0115";
+	public static String programVersion = "0119T";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
