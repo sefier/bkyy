@@ -272,14 +272,8 @@ public class Action {
 		}
 
 		//获取考试流水要等待
-		int second = 50;
-		int jlcOffset = plan.getId() % 20;
-		
-		if(jlcOffset == 0){
-			jlcOffset = -10;
-		}
-		if(System.currentTimeMillis() > getTimestamp(8, 58, 0) && System.currentTimeMillis() < getTimestamp(8, 58, second)){
-			waitUntil(getTimestamp(8, 58, second) + jlcOffset * 1000);
+		if(System.currentTimeMillis() > getTimestamp(8, 58, 10) && System.currentTimeMillis() < getTimestamp(8, 59, 20)){
+			waitUntil(getTimestamp(8, 59, 20));
 		}
 		
 		//获取考试流水
