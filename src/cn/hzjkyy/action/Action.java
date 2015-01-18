@@ -378,7 +378,7 @@ public class Action {
 		BookGenerator bookGenerator = new BookGenerator(user, exam);
 		Request bookRequest = bookGenerator.generate();
 		
-		for(int i = 0; i < 3; i++){
+		for(int i = 0; i < 10; i++){
 			Response response = tab.visit(bookRequest);
 			
 			if(response.getResponseBody().contains("重复预约")){
@@ -396,6 +396,7 @@ public class Action {
 				return true;
 			}	
 		}		
-		return false;
+		
+		throw new RetryException("尝试预约考试失败");
 	}
 }
