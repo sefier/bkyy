@@ -272,8 +272,8 @@ public class Action {
 		}
 
 		//获取考试流水要等待
-		if(System.currentTimeMillis() > getTimestamp(8, 58, 10) && System.currentTimeMillis() < getTimestamp(8, 59, 20)){
-			waitUntil(getTimestamp(8, 59, 20));
+		if(System.currentTimeMillis() > getTimestamp(8, 57, 10) && System.currentTimeMillis() < getTimestamp(8, 58, 20)){
+			waitUntil(getTimestamp(8, 58, 20));
 		}
 		
 		//获取考试流水
@@ -352,7 +352,7 @@ public class Action {
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
 			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery);
+			waitUntil(waitToQuery + 500);
 		}
 
 		do{
