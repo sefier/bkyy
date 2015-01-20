@@ -110,16 +110,15 @@ public class BookThread extends Thread {
 						success = action.book(exam);		
 					}else{
 						applicationLog.record("获取考试失败");
-					}
-					
-					
-					if(System.currentTimeMillis() - startDetect > 5 * 60 * 1000){
-						try {
-							Thread.sleep(10 * 1000);
-						} catch (InterruptedException e) {
+						
+						if(System.currentTimeMillis() - startDetect > 5 * 60 * 1000){
+							try {
+								Thread.sleep(10 * 1000);
+							} catch (InterruptedException e) {
+							}
+							throw new RetryException("长时间未能获取到考试日期，重新进行循环，以避免超时问题");
 						}
-						throw new RetryException("长时间未能获取到考试日期，重新进行循环，以避免超时问题");
-					}
+					}					
 				}while(!success);
 					
 			}catch(UnloginException ex){
