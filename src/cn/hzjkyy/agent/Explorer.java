@@ -164,7 +164,7 @@ public class Explorer {
 		        				int sleep = Integer.parseInt(value) + 1;
 		        				int second = sleep * 1000 + 1000;
 		        				
-								Thread.sleep(second);
+								Thread.sleep(second * 2);
 								if(second < 30000){
 									explorerLog.record("按钮点击过早，需要额外等待" + second);
 									offset += second;
