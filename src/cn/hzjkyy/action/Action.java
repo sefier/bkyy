@@ -272,8 +272,9 @@ public class Action {
 		}
 
 		//获取考试流水要等待
-		if(System.currentTimeMillis() > getTimestamp(8, 57, 10) && System.currentTimeMillis() < getTimestamp(8, 58, 20)){
-			waitUntil(getTimestamp(8, 58, 20));
+		long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
+		if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
+			waitUntil(startStamp);
 		}
 		
 		//获取考试流水
