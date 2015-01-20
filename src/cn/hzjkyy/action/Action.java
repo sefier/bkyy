@@ -353,7 +353,7 @@ public class Action {
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
 			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery + 500);
+			waitUntil(waitToQuery + plan.getId() % 100 * 5);
 		}
 
 		do{
