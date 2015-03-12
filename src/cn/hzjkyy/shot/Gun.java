@@ -21,6 +21,7 @@ public class Gun {
 		gun.viewTarget(1);
 	}
 	
+	private boolean pushed = false;
 	private String host;
 	private int port;
 	
@@ -65,6 +66,7 @@ public class Gun {
 	
 	//指定时间内查看靶子
 	public Target viewTarget(int seconds) {
+		pushed = true;
 		StringBuffer sb = new StringBuffer();
 		try {
 			client.setSoTimeout(seconds * 1000);
@@ -83,6 +85,10 @@ public class Gun {
 		Target target = new Target(sb.toString(), 0);
 		Shooter.recordln(target);
 		return target;
+	}
+	
+	public boolean hasBeenPushed() {
+		return pushed;
 	}
 	
 	//关上枪栓

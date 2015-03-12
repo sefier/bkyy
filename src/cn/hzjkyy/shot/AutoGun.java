@@ -53,6 +53,10 @@ public class AutoGun extends Gun implements Runnable {
 		full = true;
 	}
 	
+	public boolean isFull() {
+		return full;
+	}
+	
 	private Target report = new Target(null, 4);
 	public Target getReport(){
 		return report;
