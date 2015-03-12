@@ -42,7 +42,7 @@ public class BookThread extends Thread {
 
 		Exam exam = null;
 		boolean success = false;
-		String newPass = "201412";
+		String newPass = "201504";
 		
 //		Pattern p = Pattern.compile("(\\d{17})");
 //		Matcher m = p.matcher(plan.getSfzmhm());
