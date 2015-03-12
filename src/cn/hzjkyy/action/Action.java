@@ -406,7 +406,7 @@ public class Action {
 		bookArmy.prepare(String.format(headFormat, bookLength), preBookBody, endQuery);	
 	}
 	
-	public void shot() throws SuccessException {
+	public void shot() throws SuccessException, RetryException {
 		hasShotten = true;
 		
 		ExamParser examParser = new ExamParser(plan, user);
@@ -426,9 +426,9 @@ public class Action {
 		
 		Exam exam = examParser.getExam();
 		if(exam == null) {
-			return;
+			stopShot();
+			throw new RetryException("shot没有获取考试日期");
 		}
-		queryArmy.dismiss();
 		
 		// 当查到日期后，开启10个线程去预约考试
 		String postBookBody = exam.ksdd + "%3C%2Fksdd%3E%3Cksrq%3E" + exam.ksrq + "%3C%2Fksrq%3E%3Ckscc%3E" + exam.kscc + "%3C%2Fkscc%3E%3C%2FWriteCondition%3E%3C%2Froot%3E";
@@ -443,13 +443,13 @@ public class Action {
 					if(response.getResponseBody().contains("重复预约")){
 						Pattern ksrqPattern = Pattern.compile("201\\d-\\d+-\\d+");
 						Matcher m = ksrqPattern.matcher(response.getResponseBody());
-						bookArmy.dismiss();
+						stopShot();
 						throw new SuccessException(m.find() ? m.group() : "2015-01-01");
 					}					
 
 					if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
-						actionLog.record("预约考试成功！");
-						bookArmy.dismiss();
+						actionLog.record("shot预约考试成功！");
+						stopShot();
 						throw new SuccessException(exam.ksrq);
 					}	
 				}
@@ -460,6 +460,11 @@ public class Action {
 			} catch (InterruptedException e) {
 			}
 		}
+	}
+	
+	private void stopShot() {
+		queryArmy.dismiss();
+		bookArmy.dismiss();
 	}
 	
 	//预约
