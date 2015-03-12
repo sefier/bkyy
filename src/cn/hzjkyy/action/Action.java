@@ -40,6 +40,8 @@ import cn.hzjkyy.parser.LoginVerifyParser;
 import cn.hzjkyy.parser.ModifyParser;
 import cn.hzjkyy.parser.SendParser;
 import cn.hzjkyy.parser.TpyzmParser;
+import cn.hzjkyy.shot.Army;
+import cn.hzjkyy.shot.Shooter;
 import cn.hzjkyy.tool.Log;
 import cn.hzjkyy.tool.YzmDecoder;
 
@@ -278,9 +280,12 @@ public class Action {
 		}
 
 		//获取考试流水要等待
-		long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
-		if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
-			waitUntil(startStamp);
+		if(!hasShotten){
+			long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
+			if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
+				preShot();
+				waitUntil(startStamp);
+			}			
 		}
 		
 		//获取考试流水
@@ -356,10 +361,10 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
-		
-		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery + plan.getId() % 100 * 5);
+		if(!hasShotten){
+			if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
+				shot();
+			}			
 		}
 
 		do{
@@ -371,6 +376,71 @@ public class Action {
 		}while(!examParser.getStatusPanel().isSuccess());
 		
 		return examParser.getExam();
+	}
+	
+	private boolean hasShotten = false;
+	private Army queryArmy;
+	private Army bookArmy;
+	private long startQuery = getTimestamp(9, 0, 0) + plan.getId() % 100 * 5;
+	private long endQuery = startQuery + 1 * 60 * 1000;
+	public void preShot() {
+		String host = "121.199.52.17";
+		int port = 80;
+		String headFormat = "POST /api/httpapi HTTP/1.1\r\nConnection:close\r\nContent-Type: application/x-www-form-urlencoded\r\nHost: service.zscg.hzcdt.com\r\nContent-Length: %d\r\n\r\n";
+		
+		// 准备查询考试日期
+		queryArmy = new Army(host, port, 10);
+		int queryLength = 370;
+		String queryBody = "jkid=A001707&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CQueryCondition%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Csfzmhm%3E"
+				+ user.getSfzmhm() + "%3C%2Fsfzmhm%3E%3Cdxyzm%3E" + user.getDxyzm() + 
+				"%3C%2Fdxyzm%3E%3Ctpyzm%3E" + user.getTpyzm() + "%3C%2Ftpyzm%3E%3Ctoken%3E" + user.getToken() +
+				"%3C%2Ftoken%3E%3C%2FQueryCondition%3E%3C%2Froot%3E";
+		queryArmy.prepare(String.format(headFormat, queryLength), queryBody, endQuery);
+		
+		// 准备预约
+		bookArmy = new Army(host, port, 10);
+		String preBookBody = "jkid=B001100&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CWriteCondition%3E%3Csfzmhm%3E330122198510201942%3C%2Fsfzmhm%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Cxm%3E%25E5%25BA%2594%25E5%25B0%25BC%3C%2Fxm%3E%3Ckskm%3E2%3C%2Fkskm%3E%3Ctoken%3EE826D64C4E7C2311F3E64E8E0347FF24%3C%2Ftoken%3E%3Chphm%3E%25E6%25B5%2599AA168%3C%2Fhphm%3E%3Cly%3EA%3C%2Fly%3E%3Cksdd%3E";
+		int bookLength = 535;
+		bookArmy.prepare(String.format(headFormat, bookLength), preBookBody, endQuery);	
+	}
+	public boolean shot() {
+		hasShotten = true;
+		
+		// 开启10个线程去查询考试日期
+		ExamParser examParser = new ExamParser(plan, user);
+		do{
+			actionLog.record("通过shot获取考试信息...");
+			Shooter shooter = queryArmy.shot("", startQuery);
+			shooter.waitGunFinished();
+			Response response = Response.parseTarget(shooter.getGun().getReport());
+			if(response.getStatusPanel().isSuccess()){
+				examParser.parse(response.getResponseBody());
+			}			
+		}while(!examParser.getStatusPanel().isSuccess());
+		
+		Exam exam = examParser.getExam();
+		if(exam == null) {
+			return false;
+		}
+		
+		// 当查到日期后，开启10个线程去预约考试
+		String postBookBody = exam.ksdd + "%3C%2Fksdd%3E%3Cksrq%3E" + exam.ksrq + "%3C%2Fksrq%3E%3Ckscc%3E" + exam.kscc + "%3C%2Fkscc%3E%3C%2FWriteCondition%3E%3C%2Froot%3E";
+		bookArmy.allShot(postBookBody, System.currentTimeMillis() + exam.sysj * 1000);
+		
+			
+			if(response.getResponseBody().contains("重复预约")){
+				Pattern ksrqPattern = Pattern.compile("201\\d-\\d+-\\d+");
+				Matcher m = ksrqPattern.matcher(response.getResponseBody());
+				throw new SuccessException(m.find() ? m.group() : "2015-01-01");
+			}
+			
+
+			if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
+				actionLog.record("预约考试成功！");
+				return true;
+			}	
+
+		return true;
 	}
 	
 	//预约

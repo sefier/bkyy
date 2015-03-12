@@ -1,5 +1,6 @@
 package cn.hzjkyy.model;
 
+import cn.hzjkyy.shot.Target;
 import cn.hzjkyy.tool.StatusPanel;
 
 public class Response {
@@ -7,6 +8,10 @@ public class Response {
 	private StatusPanel statusPanel = new StatusPanel();
 	
 	public Response() {
+	}
+	
+	public static Response parseTarget(Target target) {
+		return new Response();
 	}
 	
 	public Response(String responseBody) {
