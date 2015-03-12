@@ -11,7 +11,19 @@ public class Response {
 	}
 	
 	public static Response parseTarget(Target target) {
-		return new Response();
+		Response response = new Response();
+		
+		if(target.getStatus() == 0 && target.getContent().contains("OK")) {
+			String[] parts = target.getContent().split("\r\n\r\n");
+			if(parts.length == 2){
+				response.getStatusPanel().success();
+				response.setResponseBody(parts[1]);
+			}
+		}
+		
+		response.getStatusPanel().finish(false);
+		
+		return response;
 	}
 	
 	public Response(String responseBody) {

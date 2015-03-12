@@ -1,5 +1,6 @@
 package cn.hzjkyy.action;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -396,6 +397,7 @@ public class Action {
 				"%3C%2Fdxyzm%3E%3Ctpyzm%3E" + user.getTpyzm() + "%3C%2Ftpyzm%3E%3Ctoken%3E" + user.getToken() +
 				"%3C%2Ftoken%3E%3C%2FQueryCondition%3E%3C%2Froot%3E";
 		queryArmy.prepare(String.format(headFormat, queryLength), queryBody, endQuery);
+		queryArmy.shot("", startQuery);
 		
 		// 准备预约
 		bookArmy = new Army(host, port, 10);
@@ -403,44 +405,61 @@ public class Action {
 		int bookLength = 535;
 		bookArmy.prepare(String.format(headFormat, bookLength), preBookBody, endQuery);	
 	}
-	public boolean shot() {
+	
+	public void shot() throws SuccessException {
 		hasShotten = true;
 		
-		// 开启10个线程去查询考试日期
 		ExamParser examParser = new ExamParser(plan, user);
+		Shooter shooter = queryArmy.getShootingOne();
 		do{
 			actionLog.record("通过shot获取考试信息...");
-			Shooter shooter = queryArmy.shot("", startQuery);
+			if(shooter == null){
+				break;
+			}
 			shooter.waitGunFinished();
 			Response response = Response.parseTarget(shooter.getGun().getReport());
+			shooter = queryArmy.shot("", startQuery);
 			if(response.getStatusPanel().isSuccess()){
 				examParser.parse(response.getResponseBody());
-			}			
+			}
 		}while(!examParser.getStatusPanel().isSuccess());
 		
 		Exam exam = examParser.getExam();
 		if(exam == null) {
-			return false;
+			return;
 		}
+		queryArmy.dismiss();
 		
 		// 当查到日期后，开启10个线程去预约考试
 		String postBookBody = exam.ksdd + "%3C%2Fksdd%3E%3Cksrq%3E" + exam.ksrq + "%3C%2Fksrq%3E%3Ckscc%3E" + exam.kscc + "%3C%2Fkscc%3E%3C%2FWriteCondition%3E%3C%2Froot%3E";
 		bookArmy.allShot(postBookBody, System.currentTimeMillis() + exam.sysj * 1000);
+		ArrayList<Shooter> shooters = bookArmy.getShooters();
 		
-			
-			if(response.getResponseBody().contains("重复预约")){
-				Pattern ksrqPattern = Pattern.compile("201\\d-\\d+-\\d+");
-				Matcher m = ksrqPattern.matcher(response.getResponseBody());
-				throw new SuccessException(m.find() ? m.group() : "2015-01-01");
+		for(int i = 0; i < 12; i++){
+			for(Shooter s : shooters){
+				if(s.getGun().getReport().isFinished()){
+					Response response = Response.parseTarget(s.getGun().getReport());
+
+					if(response.getResponseBody().contains("重复预约")){
+						Pattern ksrqPattern = Pattern.compile("201\\d-\\d+-\\d+");
+						Matcher m = ksrqPattern.matcher(response.getResponseBody());
+						bookArmy.dismiss();
+						throw new SuccessException(m.find() ? m.group() : "2015-01-01");
+					}					
+
+					if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
+						actionLog.record("预约考试成功！");
+						bookArmy.dismiss();
+						throw new SuccessException(exam.ksrq);
+					}	
+				}
 			}
 			
-
-			if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
-				actionLog.record("预约考试成功！");
-				return true;
-			}	
-
-		return true;
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 	
 	//预约

@@ -26,6 +26,10 @@ public class Army {
 		}
 	}
 	
+	public ArrayList<Shooter> getShooters() {
+		return shooters;
+	}
+	
 	// 全体队员准备射击
 	public void prepare(String head, String body, long aboutSentAt) {
 		for(Shooter shooter : shooters) {
@@ -33,11 +37,16 @@ public class Army {
 		}
 	}
 	
+	private Shooter shootingOne;
+	public Shooter getShootingOne() {
+		return shootingOne;
+	}
 	// 下一个队员射击
 	public Shooter shot(String body, long sentAt) {
 		for(Shooter shooter : shooters) {
 			if(!shooter.hasShot()){
 				shooter.shot(body, sentAt);
+				shootingOne = shooter;
 				return shooter;
 			}
 		}
