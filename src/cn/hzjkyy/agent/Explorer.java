@@ -121,7 +121,8 @@ public class Explorer {
 		String exceptionString = null;
 
 		int tries = 0;
-		long tryStartAt = System.currentTimeMillis();
+		long lastTryAt, tryStartAt;
+		lastTryAt = tryStartAt = System.currentTimeMillis();
 		do{
 	    	//检查服务器指令
 	    	int serverStatus = Single.status();
@@ -216,6 +217,15 @@ public class Explorer {
 	    	if(System.currentTimeMillis() - tryStartAt > 5 * 60 * 1000){
 	    		throw new RetryException("请求超时");
 	    	}
+	    	
+	    	long tryCost = System.currentTimeMillis() - lastTryAt;
+	    	if(tryCost < 5 * 1000) {
+	    		try {
+					Thread.sleep(5 * 1000 - tryCost);
+				} catch (InterruptedException e) {
+				}
+	    	}
+	    	lastTryAt = System.currentTimeMillis();
 		}while(tries < getLimits());
 
     	response.getStatusPanel().finish(false);
