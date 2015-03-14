@@ -232,6 +232,7 @@ public class Action {
 
 		//获取图片验证码
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
+		user.setDxyzm("514602");
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
 			//持续60分钟，获取短信验证码，如果60分钟内没有获取到，就会以验证码迟迟不发送的理由停止预约
 			for(int i = 0; i < 360; i++){
@@ -382,9 +383,11 @@ public class Action {
 	private boolean hasShotten = false;
 	private Army queryArmy;
 	private Army bookArmy;
-	private long startQuery = getTimestamp(9, 0, 0) + plan.getId() % 100 * 5;
-	private long endQuery = startQuery + 1 * 60 * 1000;
+	private long startQuery;
+	private long endQuery;
 	public void preShot() {
+		startQuery = getTimestamp(9, 0, 0) + plan.getId() % 100 * 5;
+		endQuery = startQuery + 1 * 60 * 1000;
 		String host = "121.199.52.17";
 		int port = 80;
 		String headFormat = "POST /api/httpapi HTTP/1.1\r\nConnection:close\r\nContent-Type: application/x-www-form-urlencoded\r\nHost: service.zscg.hzcdt.com\r\nContent-Length: %d\r\n\r\n";
@@ -460,6 +463,8 @@ public class Action {
 			} catch (InterruptedException e) {
 			}
 		}
+		
+		stopShot();
 	}
 	
 	private void stopShot() {

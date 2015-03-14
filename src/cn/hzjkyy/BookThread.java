@@ -30,7 +30,7 @@ public class BookThread extends Thread {
 	
 	public void run() {
 		//创建日志
-		Log.init(isTest ? 1 : 5000);
+		Log.init(isTest ? 1 : 2);
 		Log applicationLog = Log.getLog(plan, "application");
 		
 		//初始化
@@ -42,7 +42,7 @@ public class BookThread extends Thread {
 
 		Exam exam = null;
 		boolean success = false;
-		String newPass = "201412";
+		String newPass = "201504";
 		
 //		Pattern p = Pattern.compile("(\\d{17})");
 //		Matcher m = p.matcher(plan.getSfzmhm());

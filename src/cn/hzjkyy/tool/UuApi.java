@@ -87,7 +87,7 @@ public class UuApi {
 	private String getServerUrl(String server) {
 		String url = "http://common.taskok.com:9000/Service/ServerConfig.aspx";
 
-		String result = uuGetUrl(url, new HashMap(), false);
+		String result = "1000,login.uudama.com:9000:101,upload.uuwise.com:9000:102,upload.uuwise.com:9000:103,"; //uuGetUrl(url, new HashMap(), false);
 
 		if (result.isEmpty()) {
 			return "-1001";
@@ -123,7 +123,7 @@ public class UuApi {
 		this.userPassword = passWord;
 		this.userAgent = Md5.MD5(this.softKEY.toUpperCase() + this.userName.toUpperCase()) + macAddress;
 
-		String url = getServerUrl("service") + "/Upload/Login.aspx?U=" + userName + "&P=" + Md5.MD5(userPassword) + "&R=" + System.currentTimeMillis();
+		String url = "http://login.uudama.com:9000/Upload/Login.aspx?U=" + userName + "&P=" + Md5.MD5(userPassword) + "&R=" + System.currentTimeMillis();
 		String result = uuGetUrl(url, new HashMap(), false);
 		if (!result.isEmpty()) {
 			this.userKey = result;
