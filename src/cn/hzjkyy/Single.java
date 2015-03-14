@@ -12,7 +12,7 @@ import cn.hzjkyy.model.Plan;
 import cn.hzjkyy.tool.Log;
 
 public class Single {
-	public static String programVersion = "0313";
+	public static String programVersion = "check";
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;
@@ -21,20 +21,9 @@ public class Single {
 		PlanClient planClient = new PlanClient(isTest);
 		
 		//向服务器报到
-		int serverId = -1;
-		do {
-			try{
-				String world = planClient.hello();
-				serverLog("向服务器报到，收到编号：" + world);
-				serverId = Integer.parseInt(world);			
-			}catch(NumberFormatException e){
-				serverLog("编号解析异常");
-			}			
-		}while(serverId <= 0);
-		serverLog("服务器报到结束，编号：" + serverId);
+		int serverId = 1000000;
 		
 		//向服务器获取预约计划
-		waitUntil(getTimestamp(8, 30) + (serverId % 100) * 1200);
 		serverLog("向服务器获取预约计划");
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
@@ -54,7 +43,6 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(8, 36) + (serverId % 120) * 2 * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);

@@ -155,29 +155,30 @@ public class PlanClient {
 	}
 	
 	public int over(){
-		int over = 0;
-		String serverUrl = "http://" + getHost() + "/signal.txt";
-		HttpGet httpGet = new HttpGet(serverUrl);
-		CloseableHttpResponse httpResponse = null;
-				
-		try {			
-	        httpResponse = httpclient.execute(httpGet);
-	        int status = httpResponse.getStatusLine().getStatusCode();
-	        if (status >= 200 && status < 300){
-	        	String response = EntityUtils.toString(httpResponse.getEntity());
-	        	over = Integer.parseInt(response);
-	        }
-		} catch (ParseException | IOException e) {
-		} finally {
-			if (httpResponse != null) {
-				try {
-					httpResponse.close();
-				} catch (IOException e) {
-				}				
-			}
-		}
-		
-		return over;
+		return 1;
+//		int over = 0;
+//		String serverUrl = "http://" + getHost() + "/signal.txt";
+//		HttpGet httpGet = new HttpGet(serverUrl);
+//		CloseableHttpResponse httpResponse = null;
+//				
+//		try {			
+//	        httpResponse = httpclient.execute(httpGet);
+//	        int status = httpResponse.getStatusLine().getStatusCode();
+//	        if (status >= 200 && status < 300){
+//	        	String response = EntityUtils.toString(httpResponse.getEntity());
+//	        	over = Integer.parseInt(response);
+//	        }
+//		} catch (ParseException | IOException e) {
+//		} finally {
+//			if (httpResponse != null) {
+//				try {
+//					httpResponse.close();
+//				} catch (IOException e) {
+//				}				
+//			}
+//		}
+//		
+//		return over;
 	}
 	
 	private String getValue(String response, String key){

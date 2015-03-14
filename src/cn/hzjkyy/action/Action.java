@@ -228,53 +228,36 @@ public class Action {
 
 		//获取图片验证码
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
-		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
-			//持续45分钟，获取短信验证码，如果60分钟内没有获取到，就会休息预约
-			for(int i = 0; i < 360; i++){
-				
-				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
+		while(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
+			if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
+				String dxYzm = planClient.yzmQuery(plan);
+				if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
+					user.setDxyzm(dxYzm);
+				}else if(System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
 					sendYzm();
 				}
+			}				
+			
+			if(user.getTpyzm() == null || user.getTpyzm().equals("")){
+				actionLog.record("系统开始获取图片验证码");
+				TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
+				Request tpyzmRequest = tpyzmGenerator.generate();
 				
-				if(user.getTpyzm() == null || user.getTpyzm().equals("")){
-					actionLog.record("系统开始获取图片验证码");
-					TpyzmGenerator tpyzmGenerator = new TpyzmGenerator(user);
-					Request tpyzmRequest = tpyzmGenerator.generate();
-					
-					do {
-						actionLog.record("获取图片验证码...");
-						Response response = tab.visit(tpyzmRequest);
-						if(response.getStatusPanel().isSuccess()){
-							user.setTpyzm(null);
-							tpyzmParser.parse(response.getResponseBody());
-						}
-					}while(!tpyzmParser.getStatusPanel().isSuccess());
-					user.setTpyzm(tpyzmParser.getTpyzm());			
-				}
-
-				if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-					String dxYzm = planClient.yzmQuery(plan);
-					if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
-						user.setDxyzm(dxYzm);
-						break;
-					}else{
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e) {
-						}
-					}					
-				}				
-			}			
-		}
-
-		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
-			throw new StopException("迟迟等不到短信验证码");
-		}
-
-		//获取考试流水要等待
-		long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
-		if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
-			waitUntil(startStamp);
+				do {
+					actionLog.record("获取图片验证码...");
+					Response response = tab.visit(tpyzmRequest);
+					if(response.getStatusPanel().isSuccess()){
+						user.setTpyzm(null);
+						tpyzmParser.parse(response.getResponseBody());
+					}
+				}while(!tpyzmParser.getStatusPanel().isSuccess());
+				user.setTpyzm(tpyzmParser.getTpyzm());			
+			}
+			
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+			}
 		}
 		
 		//获取考试流水
@@ -283,7 +266,7 @@ public class Action {
 		Request jlcRequest = jlcGenerator.generate();
 		JlcParser jlcParser = new JlcParser();
 		
-		long wait = 37000;
+		long wait = 60000;
 		long startJlc = System.currentTimeMillis();
 		
 		do {
@@ -350,12 +333,6 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
-		
-		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery + plan.getId() % 100 * 5);
-		}
-
 		do{
 			actionLog.record("获取考试信息...");
 			Response response = tab.visit(examRequest);

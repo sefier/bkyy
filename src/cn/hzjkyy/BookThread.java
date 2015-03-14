@@ -30,7 +30,7 @@ public class BookThread extends Thread {
 	
 	public void run() {
 		//创建日志
-		Log.init(isTest ? 1 : 5000);
+		Log.init(isTest ? 1 : 2);
 		Log applicationLog = Log.getLog(plan, "application");
 		
 		//初始化
@@ -94,7 +94,7 @@ public class BookThread extends Thread {
 						exam = action.detect(planClient);
 						if(exam != null){
 							try {
-								int wait = exam.sysj;
+								int wait = exam.sysj + 10 * 1000;
 								applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
 								applicationLog.record("累计等待" + wait);
 								Thread.sleep(wait);
