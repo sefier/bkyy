@@ -177,7 +177,12 @@ public class Explorer {
 		        		}
 		        		throw new RetryException("按钮点击过早");
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
-		        		throw new StopException("访问过于频繁");
+		        		explorerLog.record("系统访问过于频繁");
+		        		try {
+							Thread.sleep(60 * 1000);
+						} catch (InterruptedException e) {
+						}
+		        		throw new RetryException("访问过于频繁");
 		        	}else if(responseString.contains("你的操作已超时")){
 		        		throw new RetryException("操作超时");
 		        	}else if(responseString.contains("Cursor")){
@@ -237,5 +242,14 @@ public class Explorer {
         	explorerLog.record("异常信息：" + exceptionString);    		
     	}
     	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
+    	
+    	long tryCost = System.currentTimeMillis() - lastTryAt;
+    	if(tryCost < 5 * 1000) {
+    		try {
+				Thread.sleep(5 * 1000 - tryCost);
+			} catch (InterruptedException e) {
+			}
+    	}
+
 	}
 }
