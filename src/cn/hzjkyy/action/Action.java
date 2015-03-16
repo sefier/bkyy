@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.hzjkyy.Single;
 import cn.hzjkyy.agent.PauseException;
 import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.agent.RetryException;
@@ -230,7 +231,10 @@ public class Action {
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
 			//持续45分钟，获取短信验证码，如果60分钟内没有获取到，就会休息预约
-			for(int i = 0; i < 360; i++){
+			while(true){
+		    	if(Single.status() == 3){
+		    		throw new StopException("检查验证码时收到中心服务器指示：3");
+		    	}
 				
 				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
 					sendYzm();
@@ -265,16 +269,6 @@ public class Action {
 					}					
 				}				
 			}			
-		}
-
-		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
-			throw new StopException("迟迟等不到短信验证码");
-		}
-
-		//获取考试流水要等待
-		long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
-		if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
-			waitUntil(startStamp);
 		}
 		
 		//获取考试流水
@@ -350,12 +344,6 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
-		
-		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-			long waitToQuery = getTimestamp(9, 0, 0);
-			waitUntil(waitToQuery + plan.getId() % 100 * 5);
-		}
-
 		do{
 			actionLog.record("获取考试信息...");
 			Response response = tab.visit(examRequest);

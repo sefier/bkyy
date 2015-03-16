@@ -34,7 +34,6 @@ public class Single {
 		serverLog("服务器报到结束，编号：" + serverId);
 		
 		//向服务器获取预约计划
-		waitUntil(getTimestamp(8, 30) + (serverId % 100) * 1200);
 		serverLog("向服务器获取预约计划");
 		ArrayList<Plan> plans = new ArrayList<Plan>();
 		do {
@@ -54,7 +53,6 @@ public class Single {
 		}
 		
 		int size = plans.size();
-		waitUntil(getTimestamp(8, 36) + (serverId % 120) * 2 * 1000);
 		do {
 			int signal = planClient.over();
 			serverLog("获取中心服务器信号：" + signal);
