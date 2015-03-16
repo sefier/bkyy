@@ -179,7 +179,7 @@ public class Explorer {
 		        	}else if(responseString.contains("系统检测到您的账号访问过于频繁")){
 		        		explorerLog.record("系统访问过于频繁");
 		        		try {
-							Thread.sleep(60 * 1000);
+							Thread.sleep(60 * 60 * 1000);
 						} catch (InterruptedException e) {
 						}
 		        		throw new RetryException("访问过于频繁");
