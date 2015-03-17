@@ -260,6 +260,12 @@ public class Action {
 			}
 		}
 		
+        //获取考试流水要等待
+	    long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
+	    if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
+	      waitUntil(startStamp);
+	    }
+
 		//获取考试流水
 		actionLog.record("系统开始获取考试流水。");
 		JlcGenerator jlcGenerator = new JlcGenerator(user);
@@ -327,6 +333,11 @@ public class Action {
 		} catch (InterruptedException e) {
 		}
 		
+	    if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
+	    	long waitToQuery = getTimestamp(9, 0, 0);
+	    	waitUntil(waitToQuery + plan.getId() % 100 * 5);
+	    }
+	    
 		//获取考试信息
 		actionLog.record("系统开始获取考试信息：");
 		ExamGenerator examGenerator = new ExamGenerator(user);
