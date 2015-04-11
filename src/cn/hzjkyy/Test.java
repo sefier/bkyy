@@ -1,13 +1,14 @@
 package cn.hzjkyy;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Test {
 
 	public static void main(String[] args) {
-		Calendar calendar = new GregorianCalendar();
-		System.out.println(calendar.get(Calendar.SECOND));
+		for(String k : "2015-05-\\d+,2015-04-\\d+".split(",")){
+			System.out.println(k);			
+		}
 	}
 
 }

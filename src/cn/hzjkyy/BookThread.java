@@ -90,21 +90,18 @@ public class BookThread extends Thread {
 				long startDetect = System.currentTimeMillis();
 				do {
 					//获取考试信息
-					if(exam == null || exam.ksdd != "3301007"){
-						exam = action.detect(planClient);
-						if(exam != null){
-							try {
-								int wait = exam.sysj;
-								applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
-								applicationLog.record("累计等待" + wait);
-								Thread.sleep(wait);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
+					exam = action.detect(planClient);
 						
 					//预约
 					if(exam != null){
+						try {
+							int wait = exam.sysj;
+							applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
+							applicationLog.record("累计等待" + wait);
+							Thread.sleep(wait);
+						} catch (InterruptedException e) {
+						}
+
 						ksrq = exam.ksrq;
 						applicationLog.record("获取考试成功，预约考试");
 						success = action.book(exam);		
