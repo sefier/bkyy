@@ -353,8 +353,8 @@ public class Action {
 		
 		if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
 			long waitToQuery = getTimestamp(9, 0, 0);
-			int windows = user.getKskm().equals("2") ? 50 : 30;
-			waitUntil(waitToQuery + plan.getId() % 100 * windows);
+			int windows = plan.getWindow();
+			waitUntil(waitToQuery + windows);
 		}
 
 		do{

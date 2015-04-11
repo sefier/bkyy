@@ -111,11 +111,13 @@ public class PlanClient {
 	        		}
 	        		Plan plan = new Plan();
 		        	plan.setId(Integer.parseInt(getValue(planString, "id")));
+		        	plan.setWindow(Integer.parseInt(getValue(planString, "window")));
 		        	plan.setSfzmhm(getValue(planString, "sfzmhm"));
 		        	plan.setPass(getValue(planString, "pass"));
 		        	plan.setKsdd(getValue(planString, "ksdd"));
 		        	plan.setStartKsrq(getValue(planString, "start_ksrq"));
 		        	plan.setEndKsrq(getValue(planString, "end_ksrq"));
+		        	plan.setKsrqFormat(getValue(planString, "ksrq_format"));
 		        	plans.add(plan);
 	        	}
 	        }
