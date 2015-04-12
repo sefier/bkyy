@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.hzjkyy.Single;
 import cn.hzjkyy.agent.PauseException;
 import cn.hzjkyy.agent.PlanClient;
 import cn.hzjkyy.agent.RetryException;
@@ -230,7 +231,11 @@ public class Action {
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
 			//持续45分钟，获取短信验证码，如果60分钟内没有获取到，就会休息预约
-			for(int i = 0; i < 360; i++){
+			for(int i = 0; i < 3600; i++){
+				int serverStatus = Single.status();
+				if(serverStatus == 3){
+					throw new StopException("收集短信验证码阶段，服务器指示：3");
+				}				 				
 				
 				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
 					sendYzm();
