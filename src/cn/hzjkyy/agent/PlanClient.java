@@ -144,7 +144,7 @@ public class PlanClient {
 			nvps.add(new BasicNameValuePair("ksrq", ksrq));
 			nvps.add(new BasicNameValuePair("reason", reason));
 			nvps.add(new BasicNameValuePair("success", success ? "2" : "3"));
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+			httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
 	        httpResponse = httpclient.execute(httpPost);
 		} catch (ParseException | IOException e) {
 		} finally {
