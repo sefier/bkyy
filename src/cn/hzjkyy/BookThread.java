@@ -66,6 +66,7 @@ public class BookThread extends Thread {
 		
 		explorer.setCheckingMode(true);
 		String ksrq = "";
+		String reason = "";
 		do {
 			try{
 				do {
@@ -128,6 +129,7 @@ public class BookThread extends Thread {
 				}
 				applicationLog.record("进入下一个账号：" + ne.getReason());
 			}catch(StopException se){
+				reason = se.getReason();
 				applicationLog.record("停止预约：" + se.getReason());
 				break;
 			} catch (SuccessException se) {
@@ -137,6 +139,7 @@ public class BookThread extends Thread {
 					success = true;
 					ksrq = se.getKsrq();
 				}else if(plan.seIncrease()){
+					reason = "多次检查发现上一次预约记录无法清除";
 					break;
 				}
 			}
@@ -150,8 +153,12 @@ public class BookThread extends Thread {
 //		} catch (UnloginException | PauseException | StopException | NextException e) {
 //		}
 		
+		if(success){
+			reason = "预约成功";
+		}
+		
 		Single.finishPlan(plan.getId());
-		planClient.report(plan, ksrq, success);
+		planClient.report(plan, ksrq, success, reason);
 		action.close();
 		explorer.close();
 		applicationLog.close();

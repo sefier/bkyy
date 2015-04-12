@@ -134,7 +134,7 @@ public class PlanClient {
 		return plans;
 	}
 	
-	public void report(Plan plan, String ksrq, boolean success) {
+	public void report(Plan plan, String ksrq, boolean success, String reason) {
 		String serverUrl = "http://" + getHost() + "/plans/" + plan.getId() + "/report";
 		HttpPost httpPost = new HttpPost(serverUrl);
 		CloseableHttpResponse httpResponse = null;
@@ -142,6 +142,7 @@ public class PlanClient {
 		try {
 			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
 			nvps.add(new BasicNameValuePair("ksrq", ksrq));
+			nvps.add(new BasicNameValuePair("reason", reason));
 			nvps.add(new BasicNameValuePair("success", success ? "2" : "3"));
             httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 	        httpResponse = httpclient.execute(httpPost);
