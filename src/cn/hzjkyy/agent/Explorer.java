@@ -110,7 +110,8 @@ public class Explorer {
 		this.checkingMode = checkingMode;
 	}
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
-	void sendRequest(Tab tab) throws UnloginException, RetryException, StopException, PauseException {
+	boolean sendRequest(Tab tab) throws UnloginException, RetryException, StopException, PauseException {
+		boolean suspect = false;
 		Request request = tab.getRequest();
 		//设定请求参数
 		List<NameValuePair> nvps = generateNvps(request);
@@ -143,8 +144,10 @@ public class Explorer {
 		        if (status >= 200 && status < 300){
 		        	String responseString = EntityUtils.toString(httpResponse.getEntity());
 		        	if(responseString.contains("JDBC")){
+		        		suspect = true;
 			        	exceptionString = "JDBC异常:" + responseString;
 		        	}else if(responseString.contains("您的系统未在本地址正确注册")){
+		        		suspect = true;
 			        	exceptionString = "未注册异常:" + responseString;
 		        	}else if(responseString.contains("登录已超时")){
 		        		throw new UnloginException();
@@ -198,6 +201,7 @@ public class Explorer {
 		        	}
 		        }else{
 		        	exceptionString = "Status:" + status + EntityUtils.toString(httpResponse.getEntity());
+		        	suspect = true;
 		        }
 			} catch (ParseException | IOException e) {
 				exceptionString = Log.exceptionStacktraceToString(e);
@@ -227,5 +231,7 @@ public class Explorer {
         	explorerLog.record("异常信息：" + exceptionString);    		
     	}
     	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
+    	
+    	return suspect;
 	}
 }
