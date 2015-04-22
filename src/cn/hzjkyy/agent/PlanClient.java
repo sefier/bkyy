@@ -111,11 +111,13 @@ public class PlanClient {
 	        		}
 	        		Plan plan = new Plan();
 		        	plan.setId(Integer.parseInt(getValue(planString, "id")));
+		        	plan.setWindow(Integer.parseInt(getValue(planString, "window")));
 		        	plan.setSfzmhm(getValue(planString, "sfzmhm"));
 		        	plan.setPass(getValue(planString, "pass"));
 		        	plan.setKsdd(getValue(planString, "ksdd"));
 		        	plan.setStartKsrq(getValue(planString, "start_ksrq"));
 		        	plan.setEndKsrq(getValue(planString, "end_ksrq"));
+		        	plan.setKsrqFormat(getValue(planString, "ksrq_format"));
 		        	plans.add(plan);
 	        	}
 	        }
@@ -132,7 +134,7 @@ public class PlanClient {
 		return plans;
 	}
 	
-	public boolean report(Plan plan, String ksrq, boolean success) {
+	public boolean report(Plan plan, String ksrq, boolean success, String reason) {
 		String serverUrl = "http://" + getHost() + "/plans/" + plan.getId() + "/report";
 		HttpPost httpPost = new HttpPost(serverUrl);
 		CloseableHttpResponse httpResponse = null;
@@ -140,8 +142,9 @@ public class PlanClient {
 		try {
 			List<NameValuePair> nvps = new ArrayList <NameValuePair>();
 			nvps.add(new BasicNameValuePair("ksrq", ksrq));
+			nvps.add(new BasicNameValuePair("reason", reason));
 			nvps.add(new BasicNameValuePair("success", success ? "2" : "3"));
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+			httpPost.setEntity(new UrlEncodedFormEntity(nvps, "UTF-8"));
 	        httpResponse = httpclient.execute(httpPost);
 	        
 	        if(httpResponse.getStatusLine().getStatusCode() >= 200 && httpResponse.getStatusLine().getStatusCode() < 300){

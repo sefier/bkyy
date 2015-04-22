@@ -43,7 +43,7 @@ public class BookThread extends Thread {
 		Exam exam = null;
 		boolean success = false;
 		String newPass = "201504";
-				
+
 		if(newPass != null){
 			try {
 				explorer.setCheckingMode(false);
@@ -55,6 +55,7 @@ public class BookThread extends Thread {
 		
 		explorer.setCheckingMode(true);
 		String ksrq = "";
+		String reason = "";
 		do {
 			try{
 				do {
@@ -79,21 +80,18 @@ public class BookThread extends Thread {
 				long startDetect = System.currentTimeMillis();
 				do {
 					//获取考试信息
-					if(exam == null || exam.ksdd != "3301007"){
-						exam = action.detect(planClient);
-						if(exam != null){
-							try {
-								int wait = exam.sysj;
-								applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
-								applicationLog.record("累计等待" + wait);
-								Thread.sleep(wait);
-							} catch (InterruptedException e) {
-							}
-						}
-					}
+					exam = action.detect(planClient);
 						
 					//预约
 					if(exam != null){
+						try {
+							int wait = exam.sysj;
+							applicationLog.record("考试表示的剩余时间为：" + exam.sysj);
+							applicationLog.record("累计等待" + wait);
+							Thread.sleep(wait);
+						} catch (InterruptedException e) {
+						}
+
 						ksrq = exam.ksrq;
 						applicationLog.record("获取考试成功，预约考试");
 						success = action.book(exam);		
@@ -120,6 +118,7 @@ public class BookThread extends Thread {
 				}
 				applicationLog.record("进入下一个账号：" + ne.getReason());
 			}catch(StopException se){
+				reason = se.getReason();
 				applicationLog.record("停止预约：" + se.getReason());
 				break;
 			} catch (SuccessException se) {
@@ -129,11 +128,16 @@ public class BookThread extends Thread {
 					success = true;
 					ksrq = se.getKsrq();
 				}else if(plan.seIncrease()){
+					reason = "多次检查发现上一次预约记录无法清除";
 					break;
 				}
 			}
 		}while(!success);
 				
+		if(success){
+			reason = "预约成功";
+		}
+
 		Single.finishPlan(plan.getId());
 
 		boolean reportSuccess = false;
@@ -144,10 +148,10 @@ public class BookThread extends Thread {
 			}
 
 			applicationLog.record("汇报计划运行结果");
-			reportSuccess = planClient.report(plan, ksrq, success);
+			reportSuccess = planClient.report(plan, ksrq, success, reason);
 		}while(!reportSuccess);
-		
 		applicationLog.record("汇报成功");
+
 		
 		action.close();
 		explorer.close();

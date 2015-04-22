@@ -8,9 +8,20 @@ public class Plan {
 	private String startKsrq;
 	private String endKsrq;
 
+	private int window;
+	public int getWindow() {
+		return window;
+	}
+	public void setWindow(int window) {
+		this.window = window;
+	}
+
 	private String ksrqFormat = "2015-04-\\d+";
 	public String getKsrqFormat(){
 		return ksrqFormat;
+	}
+	public void setKsrqFormat(String ksrqFormat){
+		this.ksrqFormat = ksrqFormat;
 	}
 	private int seTimes = 0;
 	public boolean seIncrease() {

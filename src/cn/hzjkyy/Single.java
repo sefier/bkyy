@@ -13,6 +13,7 @@ import cn.hzjkyy.tool.Log;
 
 public class Single {
 	public static String programVersion = "0501";
+
 	public static void main(String[] args){
 		//程序运行环境
 		boolean isTest = false;

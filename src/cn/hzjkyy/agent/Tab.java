@@ -37,7 +37,7 @@ public class Tab {
 		response.clear();
 		request.setSentAt(System.currentTimeMillis());
 		this.request = request;
-		explorer.sendRequest(this);
+		this.response.suspect = explorer.sendRequest(this);
 		return this.response;
 	}
 }

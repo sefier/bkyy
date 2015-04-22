@@ -4,6 +4,7 @@ import cn.hzjkyy.shot.Target;
 import cn.hzjkyy.tool.StatusPanel;
 
 public class Response {
+	public boolean suspect;
 	private String responseBody;
 	private StatusPanel statusPanel = new StatusPanel();
 	

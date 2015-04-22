@@ -234,13 +234,11 @@ public class Action {
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
 		user.setDxyzm("514602");
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
-			//持续60分钟，获取短信验证码，如果60分钟内没有获取到，就会以验证码迟迟不发送的理由停止预约
-			for(int i = 0; i < 360; i++){
-		    	//检查服务器指令
-		    	int serverStatus = Single.status();
-		    	if(serverStatus == 3){
-		    		throw new StopException("收集短信验证码阶段，服务器指示：3");
-		    	}
+			for(int i = 0; i < 3600; i++){
+				int serverStatus = Single.status();
+				if(serverStatus == 3){
+					throw new StopException("收集短信验证码阶段，服务器指示：3");
+				}				 				
 				
 				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
 					sendYzm();
@@ -365,8 +363,11 @@ public class Action {
 		
 		if(!hasShotten){
 			if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
+				long waitToQuery = getTimestamp(9, 0, 0);
+				int windows = plan.getWindow();
+				waitUntil(waitToQuery + windows);
 				shot();
-			}			
+			}
 		}
 
 		do{
@@ -481,15 +482,19 @@ public class Action {
 		for(int i = 0; i < 10; i++){
 			Response response = tab.visit(bookRequest);
 			
+			if(response.suspect){
+				actionLog.record("预约结果可疑！");
+			}
+			
 			if(response.getResponseBody().contains("重复预约")){
 				Pattern ksrqPattern = Pattern.compile("201\\d-\\d+-\\d+");
 				Matcher m = ksrqPattern.matcher(response.getResponseBody());
 				throw new SuccessException(m.find() ? m.group() : "2015-01-01");
 			}
 			
-//			if(response.getResponseBody().contains("请在次月再行预约")){
-//				throw new StopException("驾校名额已满");
-//			}
+			if(response.getResponseBody().contains("请在次月再行预约")){
+				throw new StopException("驾校名额已满");
+			}
 
 			if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
 				actionLog.record("预约考试成功！");
