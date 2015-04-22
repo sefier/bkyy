@@ -132,7 +132,7 @@ public class PlanClient {
 		return plans;
 	}
 	
-	public void report(Plan plan, String ksrq, boolean success) {
+	public boolean report(Plan plan, String ksrq, boolean success) {
 		String serverUrl = "http://" + getHost() + "/plans/" + plan.getId() + "/report";
 		HttpPost httpPost = new HttpPost(serverUrl);
 		CloseableHttpResponse httpResponse = null;
@@ -143,7 +143,14 @@ public class PlanClient {
 			nvps.add(new BasicNameValuePair("success", success ? "2" : "3"));
             httpPost.setEntity(new UrlEncodedFormEntity(nvps));
 	        httpResponse = httpclient.execute(httpPost);
+	        
+	        if(httpResponse.getStatusLine().getStatusCode() >= 200 && httpResponse.getStatusLine().getStatusCode() < 300){
+		        return true;	        	
+	        }else{
+	        	return false;
+	        }
 		} catch (ParseException | IOException e) {
+			return false;
 		} finally {
 			if (httpResponse != null) {
 				try {

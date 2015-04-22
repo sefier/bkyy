@@ -43,18 +43,7 @@ public class BookThread extends Thread {
 		Exam exam = null;
 		boolean success = false;
 		String newPass = "201504";
-		
-//		Pattern p = Pattern.compile("(\\d{17})");
-//		Matcher m = p.matcher(plan.getSfzmhm());
-//		if (m.find()) {
-//			String value = m.group(1);
-//			int first = Integer.parseInt(value.substring(0, 6));
-//			int middle = Integer.parseInt(value.substring(6, 12));
-//			int last = Integer.parseInt(value.substring(12, 17));
-//			int result = (first + middle + 1000000 - last) % 1000000;
-//			newPass = "" + result;
-//		}
-		
+				
 		if(newPass != null){
 			try {
 				explorer.setCheckingMode(false);
@@ -144,17 +133,22 @@ public class BookThread extends Thread {
 				}
 			}
 		}while(!success);
-		
-//		try {
-//			if(!success && newPass != null){
-//				explorer.setCheckingMode(false);
-//				action.changePass(plan.getPass());				
-//			}
-//		} catch (UnloginException | PauseException | StopException | NextException e) {
-//		}
-		
+				
 		Single.finishPlan(plan.getId());
-		planClient.report(plan, ksrq, success);
+
+		boolean reportSuccess = false;
+		do {
+			try {
+				Thread.sleep(10000);
+			} catch (InterruptedException e) {
+			}
+
+			applicationLog.record("汇报计划运行结果");
+			reportSuccess = planClient.report(plan, ksrq, success);
+		}while(!reportSuccess);
+		
+		applicationLog.record("汇报成功");
+		
 		action.close();
 		explorer.close();
 		applicationLog.close();
