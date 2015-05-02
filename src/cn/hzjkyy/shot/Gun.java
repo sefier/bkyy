@@ -53,7 +53,7 @@ public class Gun {
 			pull();
 			writer.write(ball.toString());
 			writer.flush();
-			Shooter.record(ball);
+			System.out.println(ball);
 		} catch (IOException e) {
 			throwGunException(e);
 		}
@@ -66,8 +66,11 @@ public class Gun {
 	
 	//指定时间内查看靶子
 	public Target viewTarget(int seconds) {
+		Shooter.recordln("开始检查靶标");
+
 		pushed = true;
 		StringBuffer sb = new StringBuffer();
+		Target target;
 		try {
 			client.setSoTimeout(seconds * 1000);
 			//写完以后进行读操作
@@ -76,13 +79,14 @@ public class Gun {
 			while ((len=reader.read(chars)) != -1) {
 				sb.append(new String(chars, 0, len));  
 			}
+			target = new Target(sb.toString(), 0);
 		} catch (IOException e) {
-			return new Target(sb.toString(), 1);
+			Shooter.recordln(Log.exceptionStacktraceToString(e));
+			target = new Target(sb.toString(), 1);
 		}
 		
 		push();
-		
-		Target target = new Target(sb.toString(), 0);
+		Shooter.recordln("检查结束");
 		Shooter.recordln(target);
 		return target;
 	}

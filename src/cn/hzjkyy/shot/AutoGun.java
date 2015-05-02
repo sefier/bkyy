@@ -78,17 +78,22 @@ public class AutoGun extends Gun implements Runnable {
 						wait(100);
 					}
 
+					FireBall:
 					for(int i = 0; i < length; i++){
 						fire(currentBall.getContent().charAt(i));
 												
 						if( i < length - 1) { //如果这个子弹链条，还有子弹
-							int rest = (int)(currentBall.getStopFire() - System.currentTimeMillis());
-							if(rest > 0){ //还有时间
-								wait(rest / (length - (i + 1)));
-							}else{ //没有时间了，直接全部打光
-								fire(currentBall.getContent().substring(i + 1, currentBall.getContent().length()));
-								break;
-							}						
+							long rest = currentBall.getStopFire() - System.currentTimeMillis();
+							long shouldWait = rest / (length - (i + 1));
+							long shouldWaitTo = System.currentTimeMillis() + shouldWait;
+							
+							do {								
+								if(currentBall.getStopFire() < System.currentTimeMillis()){
+									fire(currentBall.getContent().substring(i + 1, currentBall.getContent().length()));
+									break FireBall;
+								}
+								wait(100);
+							}while(System.currentTimeMillis() < shouldWaitTo);						
 						}
 					}
 					position++;
@@ -105,7 +110,7 @@ public class AutoGun extends Gun implements Runnable {
 			Shooter.record("手枪被扔掉");
 		}catch(GunMalfunctionException e){
 			report = new Target(null, 2);
-			Shooter.record("手枪失灵");
+			Shooter.record("手枪失灵" + e.getReason());
 		}finally{
 			//关上枪栓
 			push();

@@ -96,6 +96,7 @@ public class Log {
 		
 		if(lineLimit == 1){
 			writeToConsole(data);
+			writeToFile(data);
 		}else{
 			writeToFile(data);
 		}

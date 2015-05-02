@@ -1,5 +1,7 @@
 package cn.hzjkyy.model;
 
+import java.net.URLEncoder;
+
 public class User {
 	private String sfzmhm;
 	private String pass;
@@ -27,6 +29,15 @@ public class User {
 		this.tpyzm = tpyzm;
 	}
 
+	public String getEncodedJlc() {
+		String encodedJlc = "";
+		try{
+			encodedJlc = URLEncoder.encode(URLEncoder.encode(getJlc(), "UTF-8"), "UTF-8");			
+		}catch(Exception e){			
+		}
+		
+		return encodedJlc;
+	}
 	public String getJlc() {
 		return jlc;
 	}
@@ -57,6 +68,16 @@ public class User {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+	
+	public String getEncodedXm() {
+		String encodedXm = "";
+		try{
+			encodedXm = URLEncoder.encode(URLEncoder.encode(getXm(), "UTF-8"), "UTF-8");			
+		}catch(Exception e){			
+		}
+		
+		return encodedXm;
 	}
 
 	public String getXm() {

@@ -17,6 +17,7 @@ import cn.hzjkyy.agent.StopException;
 import cn.hzjkyy.agent.SuccessException;
 import cn.hzjkyy.agent.Tab;
 import cn.hzjkyy.agent.UnloginException;
+import cn.hzjkyy.generator.AgreeGenerator;
 import cn.hzjkyy.generator.BookGenerator;
 import cn.hzjkyy.generator.ExamGenerator;
 import cn.hzjkyy.generator.FrontGenerator;
@@ -104,7 +105,16 @@ public class Action {
 		this.plan = plan;
 		this.isTest = isTest;
 		this.yzmDecoder = new YzmDecoder();
-		actionLog = Log.getLog(plan, "action");
+		actionLog = Log.getLog(plan, "action");		
+	}
+	
+	public void calculateShot() {
+		actionLog.record("计算精准射击时间");
+		long waitToQuery = System.currentTimeMillis() + 120 * 1000;
+//		long waitToQuery = getTimestamp(17, 15, 0);
+		int windows = plan.getWindow();
+		startQuery = waitToQuery + windows;
+		endQuery = startQuery + 1 * 60 * 1000;
 	}
 	
 	public void changePass(String newPass) throws UnloginException, RetryException, StopException, PauseException{
@@ -213,36 +223,42 @@ public class Action {
 		lastSendAt = System.currentTimeMillis();
 		
 	}
+	
+	public void agree() throws UnloginException, RetryException, StopException, PauseException {
+		actionLog.record("进行同意操作");
+		
+		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
+		Request agreeRequest = agreeGenerator.generate();
+		LoginVerifyParser agreeParser = new LoginVerifyParser();
+		
+		do {
+			actionLog.record("同意中...");
+			Response response = tab.visit(agreeRequest);
+			if(response.getStatusPanel().isSuccess()){
+				agreeParser.parse(response.getResponseBody());					
+			}			
+		}while(!agreeParser.getStatusPanel().isSuccess());
+		actionLog.record("同意操作成功");		
+	}
 	private long lastSendAt = 0;
 	public Exam detect(PlanClient planClient) throws UnloginException, RetryException, StopException, PauseException, SuccessException {
-//		actionLog.record("进行同意操作");
-//		
-//		AgreeGenerator agreeGenerator = new AgreeGenerator(user);
-//		Request agreeRequest = agreeGenerator.generate();
-//		LoginVerifyParser agreeParser = new LoginVerifyParser();
-//		
-//		do {
-//			actionLog.record("同意中...");
-//			Response response = tab.visit(agreeRequest);
-//			if(response.getStatusPanel().isSuccess()){
-//				agreeParser.parse(response.getResponseBody());					
-//			}			
-//		}while(!agreeParser.getStatusPanel().isSuccess());
-//		actionLog.record("同意操作成功");
-
-		//获取图片验证码
+		//获取图片验证码和短信验证码
 		TpyzmParser tpyzmParser = new TpyzmParser(yzmDecoder);
-		user.setDxyzm("514602");
 		if(user.getDxyzm() == null || user.getDxyzm().isEmpty() || user.getTpyzm() == null || user.getTpyzm().isEmpty()){
-			for(int i = 0; i < 3600; i++){
+			while(true){
 				int serverStatus = Single.status();
 				if(serverStatus == 3){
 					throw new StopException("收集短信验证码阶段，服务器指示：3");
-				}				 				
-				
-				if((user.getDxyzm() == null || user.getDxyzm().isEmpty()) && System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
-					sendYzm();
 				}
+
+				if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
+					String dxYzm = planClient.yzmQuery(plan);
+					if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
+						user.setDxyzm(dxYzm);
+					}else if(System.currentTimeMillis() - 30 * 60 * 1000 > lastSendAt){
+						sendYzm();
+					}
+				}				
 				
 				if(user.getTpyzm() == null || user.getTpyzm().equals("")){
 					actionLog.record("系统开始获取图片验证码");
@@ -261,31 +277,26 @@ public class Action {
 				}
 
 				if(user.getDxyzm() == null || user.getDxyzm().isEmpty()){
-					String dxYzm = planClient.yzmQuery(plan);
-					if(dxYzm != null && dxYzm.length() == 6 && !oldYzms.contains(dxYzm)){
-						user.setDxyzm(dxYzm);
-						break;
-					}else{
-						try {
-							Thread.sleep(10000);
-						} catch (InterruptedException e) {
-						}
-					}					
-				}				
+					try {
+						Thread.sleep(10000);
+					} catch (InterruptedException e) {
+					}
+				}else{
+					break;
+				}
 			}			
-		}
-
-		if(user.getDxyzm() == null || user.getDxyzm().length() < 6){
-			throw new StopException("迟迟等不到短信验证码");
 		}
 
 		//获取考试流水要等待
-		if(!hasShotten){
-			long startStamp = getTimestamp(8, 58, 40) + plan.getId() % 20 * 1000;
+		if(!hasShotten && user.getJlc() != null){
+			if(startQuery == 0){
+				calculateShot();
+			}
+			long startStamp = startQuery - 80 * 1000 + plan.getId() % 20 * 1000;
 			if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
-				preShot();
 				waitUntil(startStamp);
-			}			
+				preShot();
+			}
 		}
 		
 		//获取考试流水
@@ -324,7 +335,7 @@ public class Action {
 					if(plan.seIncrease()){
 						throw new StopException("不支持初考");
 					}else{
-						throw new StopException("疑似不支持初考");
+						throw new RetryException("疑似不支持初考");
 					}
 				}
 				jlcParser.parse(response.getResponseBody());
@@ -361,11 +372,8 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
-		if(!hasShotten){
-			if(System.currentTimeMillis() > getTimestamp(8, 59, 0) && System.currentTimeMillis() < getTimestamp(9, 0, 0)){
-				long waitToQuery = getTimestamp(9, 0, 0);
-				int windows = plan.getWindow();
-				waitUntil(waitToQuery + windows);
+		if(!hasShotten && startQuery != 0){
+			if(System.currentTimeMillis() > (startQuery - 60 * 1000) && System.currentTimeMillis() < startQuery){
 				shot();
 			}
 		}
@@ -386,17 +394,16 @@ public class Action {
 	private Army bookArmy;
 	private long startQuery;
 	private long endQuery;
+	
 	public void preShot() {
-		startQuery = getTimestamp(9, 0, 0) + plan.getId() % 100 * 5;
-		endQuery = startQuery + 1 * 60 * 1000;
 		String host = "121.199.52.17";
 		int port = 80;
 		String headFormat = "POST /api/httpapi HTTP/1.1\r\nConnection:close\r\nContent-Type: application/x-www-form-urlencoded\r\nHost: service.zscg.hzcdt.com\r\nContent-Length: %d\r\n\r\n";
 		
 		// 准备查询考试日期
 		queryArmy = new Army(host, port, 10);
-		int queryLength = 370;
-		String queryBody = "jkid=A001707&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CQueryCondition%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Csfzmhm%3E"
+		int queryLength = 371;
+		String queryBody = "jkid=A001707&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CQueryCondition%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Csfzmhm%3E"
 				+ user.getSfzmhm() + "%3C%2Fsfzmhm%3E%3Cdxyzm%3E" + user.getDxyzm() + 
 				"%3C%2Fdxyzm%3E%3Ctpyzm%3E" + user.getTpyzm() + "%3C%2Ftpyzm%3E%3Ctoken%3E" + user.getToken() +
 				"%3C%2Ftoken%3E%3C%2FQueryCondition%3E%3C%2Froot%3E";
@@ -405,8 +412,13 @@ public class Action {
 		
 		// 准备预约
 		bookArmy = new Army(host, port, 10);
-		String preBookBody = "jkid=B001100&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CWriteCondition%3E%3Csfzmhm%3E330122198510201942%3C%2Fsfzmhm%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Cxm%3E%25E5%25BA%2594%25E5%25B0%25BC%3C%2Fxm%3E%3Ckskm%3E2%3C%2Fkskm%3E%3Ctoken%3EE826D64C4E7C2311F3E64E8E0347FF24%3C%2Ftoken%3E%3Chphm%3E%25E6%25B5%2599AA168%3C%2Fhphm%3E%3Cly%3EA%3C%2Fly%3E%3Cksdd%3E";
-		int bookLength = 535;
+		String preBookBody = "jkid=B001100&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CWriteCondition%3E%3Csfzmhm%3E"
+				+ user.getSfzmhm() + "%3C%2Fsfzmhm%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Cxm%3E"
+				+ user.getEncodedXm() + "%3C%2Fxm%3E%3Ckskm%3E"
+				+ user.getKskm() + "%3C%2Fkskm%3E%3Ctoken%3E"
+				+ user.getToken() + "%3C%2Ftoken%3E%3Chphm%3E"
+				+ user.getEncodedJlc() + "%3C%2Fhphm%3E%3Cly%3EA%3C%2Fly%3E%3Cksdd%3E";
+		int bookLength = preBookBody.length() + 114;
 		bookArmy.prepare(String.format(headFormat, bookLength), preBookBody, endQuery);	
 	}
 	
@@ -414,15 +426,24 @@ public class Action {
 		hasShotten = true;
 		
 		ExamParser examParser = new ExamParser(plan, user);
-		Shooter shooter = queryArmy.getShootingOne();
+
+		Shooter shooter;
+		boolean firstTime = true;
 		do{
-			actionLog.record("通过shot获取考试信息...");
+			if(firstTime){
+				shooter = queryArmy.getShootingOne();
+				firstTime = false;
+			}else{
+				shooter = queryArmy.shot("", System.currentTimeMillis());
+			}
+			
 			if(shooter == null){
 				break;
 			}
+			
+			actionLog.record("通过shot获取考试信息...");
 			shooter.waitGunFinished();
 			Response response = Response.parseTarget(shooter.getGun().getReport());
-			shooter = queryArmy.shot("", startQuery);
 			if(response.getStatusPanel().isSuccess()){
 				examParser.parse(response.getResponseBody());
 			}
@@ -432,11 +453,14 @@ public class Action {
 		if(exam == null) {
 			stopShot();
 			throw new RetryException("shot没有获取考试日期");
+		}else{
+			actionLog.record("shot成功获取到考试日期");
 		}
 		
 		// 当查到日期后，开启10个线程去预约考试
 		String postBookBody = exam.ksdd + "%3C%2Fksdd%3E%3Cksrq%3E" + exam.ksrq + "%3C%2Fksrq%3E%3Ckscc%3E" + exam.kscc + "%3C%2Fkscc%3E%3C%2FWriteCondition%3E%3C%2Froot%3E";
-		bookArmy.allShot(postBookBody, System.currentTimeMillis() + exam.sysj * 1000);
+		actionLog.record("shot准备预约考试");
+		bookArmy.allShot(postBookBody, 0);
 		ArrayList<Shooter> shooters = bookArmy.getShooters();
 		
 		for(int i = 0; i < 12; i++){
@@ -492,9 +516,9 @@ public class Action {
 				throw new SuccessException(m.find() ? m.group() : "2015-01-01");
 			}
 			
-			if(response.getResponseBody().contains("请在次月再行预约")){
-				throw new StopException("驾校名额已满");
-			}
+//			if(response.getResponseBody().contains("请在次月再行预约")){
+//				throw new StopException("驾校名额已满");
+//			}
 
 			if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
 				actionLog.record("预约考试成功！");

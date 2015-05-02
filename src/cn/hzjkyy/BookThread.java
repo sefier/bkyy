@@ -30,7 +30,7 @@ public class BookThread extends Thread {
 	
 	public void run() {
 		//创建日志
-		Log.init(isTest ? 1 : 2);
+		Log.init(isTest ? 1 : 1);
 		Log applicationLog = Log.getLog(plan, "application");
 		
 		//初始化
@@ -42,16 +42,16 @@ public class BookThread extends Thread {
 
 		Exam exam = null;
 		boolean success = false;
-		String newPass = "201504";
-
-		if(newPass != null){
-			try {
-				explorer.setCheckingMode(false);
-				action.login();
-				action.changePass(newPass);
-			} catch (UnloginException | RetryException | StopException | PauseException e) {
-			}		
-		}
+//		String newPass = "201504";
+//
+//		if(newPass != null){
+//			try {
+//				explorer.setCheckingMode(false);
+//				action.login();
+//				action.changePass(newPass);
+//			} catch (UnloginException | RetryException | StopException | PauseException e) {
+//			}		
+//		}
 		
 		explorer.setCheckingMode(true);
 		String ksrq = "";
