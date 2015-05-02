@@ -53,7 +53,6 @@ public class Gun {
 			pull();
 			writer.write(ball.toString());
 			writer.flush();
-			System.out.println(ball);
 		} catch (IOException e) {
 			throwGunException(e);
 		}

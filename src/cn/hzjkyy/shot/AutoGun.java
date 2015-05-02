@@ -12,7 +12,7 @@ public class AutoGun extends Gun implements Runnable {
 		long start = System.currentTimeMillis();
 		gun.load(new Ball(head, start + 3 * 1000, start + 5 * 1000));
 		gun.load(new Ball(body, start, start + 3 * 1000));
-		gun.setViewLimit(10);
+		gun.setViewLimit(30);
 		gun.fillFull();
 	}
 	

@@ -32,12 +32,15 @@ public class Tab {
 		return response;
 	}
 	
-	//访问，直至返回结果
-	public Response visit(Request request) throws UnloginException, RetryException, StopException, PauseException {
+	public Response visit(Request request, int retryLimitMinutes) throws UnloginException, RetryException, StopException, PauseException {
 		response.clear();
 		request.setSentAt(System.currentTimeMillis());
 		this.request = request;
-		this.response.suspect = explorer.sendRequest(this);
+		this.response.suspect = explorer.sendRequest(this, retryLimitMinutes);
 		return this.response;
+	}
+	//访问，直至返回结果
+	public Response visit(Request request) throws UnloginException, RetryException, StopException, PauseException {
+		return visit(request, 5);
 	}
 }

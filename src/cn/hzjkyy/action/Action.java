@@ -110,11 +110,11 @@ public class Action {
 	
 	public void calculateShot() {
 		actionLog.record("计算精准射击时间");
-		long waitToQuery = System.currentTimeMillis() + 120 * 1000;
-//		long waitToQuery = getTimestamp(17, 15, 0);
+//		long waitToQuery = System.currentTimeMillis() + 120 * 1000;
+		long waitToQuery = getTimestamp(0, 28, 0);
 		int windows = plan.getWindow();
 		startQuery = waitToQuery + windows;
-		endQuery = startQuery + 1 * 60 * 1000;
+		endQuery = startQuery + 2 * 60 * 1000;
 	}
 	
 	public void changePass(String newPass) throws UnloginException, RetryException, StopException, PauseException{
@@ -240,6 +240,7 @@ public class Action {
 		}while(!agreeParser.getStatusPanel().isSuccess());
 		actionLog.record("同意操作成功");		
 	}
+	public boolean shooting = false;
 	private long lastSendAt = 0;
 	public Exam detect(PlanClient planClient) throws UnloginException, RetryException, StopException, PauseException, SuccessException {
 		//获取图片验证码和短信验证码
@@ -288,14 +289,16 @@ public class Action {
 		}
 
 		//获取考试流水要等待
+		shooting = false;
 		if(!hasShotten && user.getJlc() != null){
 			if(startQuery == 0){
 				calculateShot();
 			}
 			long startStamp = startQuery - 80 * 1000 + plan.getId() % 20 * 1000;
 			if(System.currentTimeMillis() > (startStamp - 60 * 1000) && System.currentTimeMillis() < startStamp){
-				waitUntil(startStamp);
 				preShot();
+				waitUntil(startStamp);
+				shooting = true;
 			}
 		}
 		
@@ -307,11 +310,13 @@ public class Action {
 		
 		long wait = 37000;
 		long startJlc = System.currentTimeMillis();
+		int retryLimitMinutes = shooting ? 2 : 5;
 		
 		do {
 			actionLog.record("获取考试流水...");
 			startJlc = System.currentTimeMillis();
-			Response response = tab.visit(jlcRequest);
+			Response response = tab.visit(jlcRequest, retryLimitMinutes);
+			
 			if(response.getStatusPanel().isSuccess()){
 				if(response.getResponseBody().contains("不能重复预约")){
 					Pattern ksrqPattern = Pattern.compile("201\\d-\\d+-\\d+");
@@ -362,7 +367,11 @@ public class Action {
 			actionLog.record("获取考试信息前要等待" + wait);
 			actionLog.record("获取考试信息前要额外等待" + this.getOffset());
 			actionLog.record("获取考试信息前最终实际等待" + (wait + this.getOffset()));
-			Thread.sleep(wait + this.getOffset());
+			if(!shooting){
+				Thread.sleep(wait + this.getOffset());				
+			}else if(System.currentTimeMillis() + wait > startQuery){
+				startQuery = System.currentTimeMillis() + wait;
+			}
 		} catch (InterruptedException e) {
 		}
 		
@@ -372,10 +381,8 @@ public class Action {
 		Request examRequest = examGenerator.generate();
 		ExamParser examParser = new ExamParser(plan, user);
 		
-		if(!hasShotten && startQuery != 0){
-			if(System.currentTimeMillis() > (startQuery - 60 * 1000) && System.currentTimeMillis() < startQuery){
-				shot();
-			}
+		if(shooting){
+			shot();
 		}
 
 		do{
@@ -409,7 +416,7 @@ public class Action {
 				"%3C%2Ftoken%3E%3C%2FQueryCondition%3E%3C%2Froot%3E";
 		queryArmy.prepare(String.format(headFormat, queryLength), queryBody, endQuery);
 		long realStartQuery = startQuery;
-		int queryOffset = 1000;
+		int queryOffset = 2000;
 		Shooter shooter = null;
 		do {
 			shooter = queryArmy.shot("", realStartQuery);
@@ -425,7 +432,8 @@ public class Action {
 				+ user.getToken() + "%3C%2Ftoken%3E%3Chphm%3E"
 				+ user.getEncodedJlc() + "%3C%2Fhphm%3E%3Cly%3EA%3C%2Fly%3E%3Cksdd%3E";
 		int bookLength = preBookBody.length() + 114;
-		bookArmy.prepare(String.format(headFormat, bookLength), preBookBody, endQuery);	
+		bookArmy.prepare(String.format(headFormat, bookLength), preBookBody, endQuery);
+		shooting = true;
 	}
 	
 	public void shot() throws SuccessException, RetryException {
@@ -469,8 +477,7 @@ public class Action {
 		bookArmy.allShot(postBookBody, 0);
 		ArrayList<Shooter> shooters = bookArmy.getShooters();
 		
-		long endBook = System.currentTimeMillis() + 60 * 1000;
-		while(System.currentTimeMillis() < endBook){
+		while(System.currentTimeMillis() < endQuery){
 			for(Shooter s : shooters){
 				if(!s.getAsked() && s.getGun().getReport().isFinished()){
 					s.setAsked(true);
@@ -499,9 +506,12 @@ public class Action {
 		stopShot();
 	}
 	
-	private void stopShot() {
-		queryArmy.dismiss();
-		bookArmy.dismiss();
+	public void stopShot() {
+		if(shooting){
+			queryArmy.dismiss();
+			bookArmy.dismiss();
+			shooting = false;
+		}
 	}
 	
 	//预约

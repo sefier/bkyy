@@ -75,7 +75,8 @@ public class BookThread extends Thread {
 						}   		
 			    	}
 				}while(true);
-
+				
+				action.stopShot();
 				action.login();
 				long startDetect = System.currentTimeMillis();
 				do {
@@ -133,7 +134,9 @@ public class BookThread extends Thread {
 				}
 			}
 		}while(!success);
-				
+
+		action.stopShot();
+
 		if(success){
 			reason = "预约成功";
 		}

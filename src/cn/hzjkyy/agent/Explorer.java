@@ -110,7 +110,7 @@ public class Explorer {
 		this.checkingMode = checkingMode;
 	}
 	//启动浏览器引擎，访问某个地址，并将结果设定在tab上
-	boolean sendRequest(Tab tab) throws UnloginException, RetryException, StopException, PauseException {
+	boolean sendRequest(Tab tab, int retryLimitMinutes) throws UnloginException, RetryException, StopException, PauseException {
 		boolean suspect = false;
 		Request request = tab.getRequest();
 		//设定请求参数
@@ -217,7 +217,7 @@ public class Explorer {
 			explorerLog.record("异常信息：" + exceptionString); 
 	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	    	
-	    	if(System.currentTimeMillis() - tryStartAt > 5 * 60 * 1000){
+	    	if(System.currentTimeMillis() - tryStartAt > retryLimitMinutes * 60 * 1000){
 	    		throw new RetryException("请求超时");
 	    	}
 		}while(tries < getLimits());
