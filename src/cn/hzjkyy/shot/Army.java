@@ -26,6 +26,16 @@ public class Army {
 		}
 	}
 	
+	public boolean allAsked() {
+		for(Shooter s : shooters) {
+			if(!s.getAsked()){
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
 	public ArrayList<Shooter> getShooters() {
 		return shooters;
 	}
@@ -66,9 +76,9 @@ public class Army {
 	// 解散
 	public void dismiss() {
 		for(Shooter shooter : shooters) {
-			if(!shooter.hasShot()){
+//			if(!shooter.hasShot()){
 				shooter.getGun().discard();				
-			}
+//			}
 		}
 	}
 }

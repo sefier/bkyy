@@ -50,9 +50,19 @@ public class Shooter {
 	}
 		
 	private AutoGun gun;
+	private boolean asked = false;
 	public Shooter(String host, int port) {
 		gun = new AutoGun(host, port);
 	}
+	
+	public void setAsked(boolean asked) {
+		this.asked = asked;
+	}
+	
+	public boolean getAsked() {
+		return asked;
+	}
+
 	public AutoGun getGun() {
 		return gun;
 	}

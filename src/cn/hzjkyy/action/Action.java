@@ -408,7 +408,13 @@ public class Action {
 				"%3C%2Fdxyzm%3E%3Ctpyzm%3E" + user.getTpyzm() + "%3C%2Ftpyzm%3E%3Ctoken%3E" + user.getToken() +
 				"%3C%2Ftoken%3E%3C%2FQueryCondition%3E%3C%2Froot%3E";
 		queryArmy.prepare(String.format(headFormat, queryLength), queryBody, endQuery);
-		queryArmy.shot("", startQuery);
+		long realStartQuery = startQuery;
+		int queryOffset = 1000;
+		Shooter shooter = null;
+		do {
+			shooter = queryArmy.shot("", realStartQuery);
+			realStartQuery += queryOffset;
+		}while(shooter != null);
 		
 		// 准备预约
 		bookArmy = new Army(host, port, 10);
@@ -426,34 +432,34 @@ public class Action {
 		hasShotten = true;
 		
 		ExamParser examParser = new ExamParser(plan, user);
+		ArrayList<Shooter> queryShooters = queryArmy.getShooters();
 
-		Shooter shooter;
-		boolean firstTime = true;
-		do{
-			if(firstTime){
-				shooter = queryArmy.getShootingOne();
-				firstTime = false;
-			}else{
-				shooter = queryArmy.shot("", System.currentTimeMillis());
+		QueryLoop:
+		while(System.currentTimeMillis() < endQuery){
+			for(Shooter s : queryShooters){
+				if(!s.getAsked() && s.getGun().getReport().isFinished()){
+					s.setAsked(true);
+					Response response = Response.parseTarget(s.getGun().getReport());
+					if(response.getStatusPanel().isSuccess()){
+						examParser.parse(response.getResponseBody());
+						if(examParser.getStatusPanel().isSuccess()){
+							break QueryLoop;
+						}
+					}
+				}
 			}
 			
-			if(shooter == null){
+			if(queryArmy.allAsked()){
 				break;
 			}
-			
-			actionLog.record("通过shot获取考试信息...");
-			shooter.waitGunFinished();
-			Response response = Response.parseTarget(shooter.getGun().getReport());
-			if(response.getStatusPanel().isSuccess()){
-				examParser.parse(response.getResponseBody());
-			}
-		}while(!examParser.getStatusPanel().isSuccess());
+		}
 		
 		Exam exam = examParser.getExam();
 		if(exam == null) {
 			stopShot();
 			throw new RetryException("shot没有获取考试日期");
 		}else{
+			queryArmy.dismiss();
 			actionLog.record("shot成功获取到考试日期");
 		}
 		
@@ -463,9 +469,11 @@ public class Action {
 		bookArmy.allShot(postBookBody, 0);
 		ArrayList<Shooter> shooters = bookArmy.getShooters();
 		
-		for(int i = 0; i < 12; i++){
+		long endBook = System.currentTimeMillis() + 60 * 1000;
+		while(System.currentTimeMillis() < endBook){
 			for(Shooter s : shooters){
-				if(s.getGun().getReport().isFinished()){
+				if(!s.getAsked() && s.getGun().getReport().isFinished()){
+					s.setAsked(true);
 					Response response = Response.parseTarget(s.getGun().getReport());
 
 					if(response.getResponseBody().contains("重复预约")){
@@ -480,12 +488,11 @@ public class Action {
 						stopShot();
 						throw new SuccessException(exam.ksrq);
 					}	
-				}
+				}				
 			}
 			
-			try {
-				Thread.sleep(5000);
-			} catch (InterruptedException e) {
+			if(bookArmy.allAsked()){
+				break;
 			}
 		}
 		
