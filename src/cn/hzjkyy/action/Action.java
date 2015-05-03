@@ -111,7 +111,7 @@ public class Action {
 	public void calculateShot() {
 		actionLog.record("计算精准射击时间");
 //		long waitToQuery = System.currentTimeMillis() + 120 * 1000;
-		long waitToQuery = getTimestamp(0, 28, 0);
+		long waitToQuery = getTimestamp(9, 0, 0);
 		int windows = plan.getWindow();
 		startQuery = waitToQuery + windows;
 		endQuery = startQuery + 2 * 60 * 1000;
@@ -450,7 +450,7 @@ public class Action {
 					Response response = Response.parseTarget(s.getGun().getReport());
 					if(response.getStatusPanel().isSuccess()){
 						examParser.parse(response.getResponseBody());
-						if(examParser.getStatusPanel().isSuccess()){
+						if(examParser.getStatusPanel().isSuccess() && examParser.getExam() != null){
 							break QueryLoop;
 						}
 					}
@@ -533,9 +533,9 @@ public class Action {
 				throw new SuccessException(m.find() ? m.group() : "2015-01-01");
 			}
 			
-//			if(response.getResponseBody().contains("请在次月再行预约")){
-//				throw new StopException("驾校名额已满");
-//			}
+			if(response.getResponseBody().contains("请在次月再行预约")){
+				throw new StopException("驾校名额已满");
+			}
 
 			if(response.getStatusPanel().isSuccess() && (response.getResponseBody().contains("您已预约成功"))){
 				actionLog.record("预约考试成功！");
