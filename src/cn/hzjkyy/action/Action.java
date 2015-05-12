@@ -408,7 +408,7 @@ public class Action {
 		String headFormat = "POST /api/httpapi HTTP/1.1\r\nConnection:close\r\nContent-Type: application/x-www-form-urlencoded\r\nHost: service.zscg.hzcdt.com\r\nContent-Length: %d\r\n\r\n";
 		
 		// 准备查询考试日期
-		queryArmy = new Army(host, port, 10);
+		queryArmy = new Army(host, port, 20);
 		int queryLength = 371;
 		String queryBody = "jkid=A001707&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CQueryCondition%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Csfzmhm%3E"
 				+ user.getSfzmhm() + "%3C%2Fsfzmhm%3E%3Cdxyzm%3E" + user.getDxyzm() + 
@@ -424,7 +424,7 @@ public class Action {
 		}while(shooter != null);
 		
 		// 准备预约
-		bookArmy = new Army(host, port, 10);
+		bookArmy = new Army(host, port, 20);
 		String preBookBody = "jkid=B001100&xlh=0C2B3243AFCB169B0E0C07533816A4D3&xmlDoc=%3C%3Fxml+version%3D%221.0%22+encoding%3D%22utf-8%22%3F%3E%3Croot%3E%3CWriteCondition%3E%3Csfzmhm%3E"
 				+ user.getSfzmhm() + "%3C%2Fsfzmhm%3E%3Csfzmmc%3EA%3C%2Fsfzmmc%3E%3Cxm%3E"
 				+ user.getEncodedXm() + "%3C%2Fxm%3E%3Ckskm%3E"
