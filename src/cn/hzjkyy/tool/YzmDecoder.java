@@ -17,7 +17,7 @@ public class YzmDecoder {
 		uuApi.setSoftInfo("101749", "c5964b2abbc6427f886d2deda1973a2a");
 		String result = "";
 		do {
-			result = uuApi.userLogin("sefier", "AnLu@203");
+			result = uuApi.userLogin("sefier", "wind&limit");
 			System.out.println("登录结果：" + result);
 		}while(!result.equals("554752"));
 		decodeResult.put("-10000", "");
