@@ -217,7 +217,7 @@ public class Explorer {
 			explorerLog.record("异常信息：" + exceptionString); 
 	    	explorerLog.record("耗时：" + (System.currentTimeMillis() - request.getSentAt()));
 	    	
-	    	if(System.currentTimeMillis() - tryStartAt > 5 * 60 * 1000){
+	    	if(System.currentTimeMillis() - tryStartAt > 15 * 60 * 1000){
 	    		throw new RetryException("请求超时");
 	    	}
 		}while(tries < getLimits());

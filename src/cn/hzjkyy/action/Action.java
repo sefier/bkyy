@@ -379,7 +379,7 @@ public class Action {
 		BookGenerator bookGenerator = new BookGenerator(user, exam);
 		Request bookRequest = bookGenerator.generate();
 		
-		for(int i = 0; i < 10; i++){
+		for(int i = 0; i < 20; i++){
 			Response response = tab.visit(bookRequest);
 			
 			if(response.suspect){
