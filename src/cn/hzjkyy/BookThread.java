@@ -42,7 +42,7 @@ public class BookThread extends Thread {
 
 		Exam exam = null;
 		boolean success = false;
-		String newPass = "201504";
+//		String newPass = "201504";
 		
 //		Pattern p = Pattern.compile("(\\d{17})");
 //		Matcher m = p.matcher(plan.getSfzmhm());
@@ -55,14 +55,14 @@ public class BookThread extends Thread {
 //			newPass = "" + result;
 //		}
 		
-		if(newPass != null){
-			try {
-				explorer.setCheckingMode(false);
-				action.login();
-				action.changePass(newPass);
-			} catch (UnloginException | RetryException | StopException | PauseException e) {
-			}		
-		}
+//		if(newPass != null){
+//			try {
+//				explorer.setCheckingMode(false);
+//				action.login();
+//				action.changePass(newPass);
+//			} catch (UnloginException | RetryException | StopException | PauseException e) {
+//			}		
+//		}
 		
 		explorer.setCheckingMode(true);
 		String ksrq = "";
